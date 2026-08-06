@@ -17,7 +17,7 @@ export function Select({ value, onValueChange, options, className }: SelectProps
       <select
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
-        className="appearance-none w-full rounded-md border border-border bg-secondary px-3 py-2 pr-8 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
+        className="appearance-none w-full rounded-md border border-border bg-secondary px-3 py-2 pr-9 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -25,7 +25,7 @@ export function Select({ value, onValueChange, options, className }: SelectProps
           </option>
         ))}
       </select>
-      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
     </div>
   );
 }
