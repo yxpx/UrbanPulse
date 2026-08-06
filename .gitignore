@@ -22,6 +22,7 @@ var/
 *.egg-info/
 *.egg
 pip-wheel-metadata/
+documentations/
 
 # Virtual environments
 venv/
