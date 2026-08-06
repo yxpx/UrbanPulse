@@ -96,3 +96,4 @@ info.md
 
 /data/raw/*
 !/data/raw/weather_CA_2019.csv
+data/security.db
