@@ -12,7 +12,9 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import torch
-from fastapi import FastAPI, HTTPException
+import sqlite3
+import hmac
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -20,6 +22,7 @@ from ultralytics import YOLO
 
 from models.stgcn_model import SimpleSTGCN
 from backend.data_loader import create_feature_bundle, create_sliding_windows
+from backend import auth
 
 
 class PredictRequest(BaseModel):
@@ -258,7 +261,107 @@ cv_service = CvService()
 
 @app.on_event("startup")
 def _startup():
+    auth.init_db()
     service.load()
+
+
+# ---------- Authentication & User Provisioning Endpoints ----------
+
+@app.post("/api/auth/login")
+def login(request: auth.LoginRequest, db: sqlite3.Connection = Depends(auth.get_db)):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = ?", (request.username,))
+    row = cursor.fetchone()
+    if not row:
+        auth.record_audit_log(db, request.username, "LOGIN_ATTEMPT", "FAILED_USER_NOT_FOUND")
+        raise HTTPException(status_code=401, detail="Invalid account credentials")
+    
+    expected_hash = auth.hash_password(request.password, row["salt"])
+    if not hmac.compare_digest(row["password_hash"], expected_hash):
+        auth.record_audit_log(db, request.username, "LOGIN_ATTEMPT", "FAILED_PASSWORD_MISMATCH")
+        raise HTTPException(status_code=401, detail="Invalid account credentials")
+        
+    token = auth.create_access_token(row["username"], row["role"])
+    auth.record_audit_log(db, row["username"], "LOGIN_SUCCESS", "TOKEN_ISSUED")
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "username": row["username"],
+        "role": row["role"]
+    }
+
+
+@app.get("/api/auth/me")
+def get_me(current_user: dict = Depends(auth.get_current_user)):
+    return current_user
+
+
+@app.get("/api/auth/users", dependencies=[Depends(auth.require_roles(["Administrator"]))])
+def list_users(db: sqlite3.Connection = Depends(auth.get_db)):
+    cursor = db.cursor()
+    cursor.execute("SELECT id, username, role, created_at FROM users ORDER BY id ASC")
+    rows = cursor.fetchall()
+    return [
+        {
+            "id": r["id"],
+            "username": r["username"],
+            "role": r["role"],
+            "created_at": str(r["created_at"])
+        }
+        for r in rows
+    ]
+
+
+@app.post("/api/auth/users", dependencies=[Depends(auth.require_roles(["Administrator"]))])
+def create_user(request: auth.UserCreateRequest, db: sqlite3.Connection = Depends(auth.get_db), current_user: dict = Depends(auth.get_current_user)):
+    if request.role not in auth.ROLES_INFO:
+        raise HTTPException(status_code=400, detail="Invalid role specified")
+    
+    cursor = db.cursor()
+    cursor.execute("SELECT count(*) FROM users WHERE username = ?", (request.username,))
+    if cursor.fetchone()[0] > 0:
+        raise HTTPException(status_code=400, detail="Username already registered in database")
+        
+    salt_hex = os.urandom(16).hex()
+    password_hash = auth.hash_password(request.password, salt_hex)
+    
+    cursor.execute(
+        "INSERT INTO users (username, password_hash, salt, role) VALUES (?, ?, ?, ?)",
+        (request.username, password_hash, salt_hex, request.role)
+    )
+    db.commit()
+    auth.record_audit_log(db, current_user.get("sub", "admin"), f"CREATE_USER_{request.username}", f"SUCCESS_ROLE_{request.role}")
+    return {"status": "User provisioned successfully", "username": request.username, "role": request.role}
+
+
+@app.delete("/api/auth/users/{user_id}", dependencies=[Depends(auth.require_roles(["Administrator"]))])
+def delete_user(user_id: int, db: sqlite3.Connection = Depends(auth.get_db), current_user: dict = Depends(auth.get_current_user)):
+    cursor = db.cursor()
+    cursor.execute("SELECT username, role FROM users WHERE id = ?", (user_id,))
+    row = cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="User identifier not found")
+    if row["username"] == "admin" or (row["role"] == "Administrator" and user_id == 1):
+        raise HTTPException(status_code=403, detail="Cannot revoke root Administrator account")
+        
+    cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    db.commit()
+    auth.record_audit_log(db, current_user.get("sub", "admin"), f"DELETE_USER_{row['username']}", "SUCCESS")
+    return {"status": "User revoked successfully"}
+
+
+@app.get("/api/auth/roles", dependencies=[Depends(auth.require_roles(["Administrator"]))])
+def get_roles():
+    return auth.ROLES_INFO
+
+
+@app.get("/api/auth/audit-logs", dependencies=[Depends(auth.require_roles(["Administrator"]))])
+def get_audit_logs(db: sqlite3.Connection = Depends(auth.get_db)):
+    cursor = db.cursor()
+    cursor.execute("SELECT id, username, event_type, status, timestamp FROM audit_logs ORDER BY id DESC LIMIT 50")
+    rows = cursor.fetchall()
+    return [dict(r) for r in rows]
+
 
 
 @app.post("/predict")
