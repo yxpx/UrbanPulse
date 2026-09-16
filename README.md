@@ -21,9 +21,10 @@ UrbanPulse/
 ├── frontend/                # Next.js dashboard application
 ├── models/                  # Model definitions and weights
 ├── scripts/                 # Data generation and utility scripts
-├── data/                    # Raw datasets and mappings
+│   └── mumbai/              # Mumbai dataset generator & verification
+├── data/                    # Raw datasets and mappings (METR-LA & MUMBAI-50)
 ├── assets/                  # Computer vision utilities
-├── reports/                 # Training metrics
+├── reports/                 # Training metrics & Mumbai dataset methodology
 ├── requirements.txt         # Python dependencies
 └── LICENSE                  # MIT License
 ```
@@ -67,6 +68,10 @@ The API will be available at `http://localhost:8000` with documentation at `http
 cd frontend
 pnpm install
 pnpm dev
+
+# For production
+pnpm build 
+pnpm start
 ```
 
 The dashboard will be available at `http://localhost:3000`.
@@ -92,6 +97,15 @@ Run these scripts to regenerate dashboard visualizations:
 python scripts/generate_timeseries_data.py
 python scripts/generate_heatmap_data.py
 python scripts/generate_sensor_locations.py
+```
+
+### Mumbai Corridor Dataset (Cross-City Sandbox)
+
+Synthesize the 50-sensor Mumbai arterial dataset and verify pipeline ingestion (see [`reports/mumbai_dataset_methodology.md`](reports/mumbai_dataset_methodology.md) and [`reports/mumbai_dataset_methodology.pdf`](reports/mumbai_dataset_methodology.pdf)):
+
+```powershell
+python scripts/mumbai/generate_mumbai_dataset.py
+python scripts/mumbai/verify_mumbai_dataset.py
 ```
 
 ## Model Training
