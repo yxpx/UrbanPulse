@@ -2,11 +2,14 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import L from "leaflet";
+import { addDarkBasemap } from "@/lib/map-basemap";
 import "leaflet/dist/leaflet.css";
 
 interface Sensor {
   id: number;
   sensor_id?: string;
+  name?: string;
+  corridor?: string;
   lat: number;
   lng: number;
   avg_speed: number;
@@ -21,6 +24,7 @@ interface RoutePlannerMapProps {
   routeLatLngs: [number, number][];
   onSelectSensor: (sensor: Sensor) => void;
   height?: string;
+  speedUnit?: string;
 }
 
 function haversineMeters(a: L.LatLng, b: L.LatLng): number {
@@ -43,6 +47,7 @@ export default function RoutePlannerMap({
   routeLatLngs,
   onSelectSensor,
   height = "560px",
+  speedUnit = "mph",
 }: RoutePlannerMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -64,8 +69,15 @@ export default function RoutePlannerMap({
   }, [sensors]);
 
   useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
-    if (!sensors.length || !bounds) return;
+    if (!mapRef.current) return;
+    if (!sensors.length) return;
+
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+    }
+
+    if (!bounds) return;
 
     const map = L.map(mapRef.current, {
       center: bounds.getCenter(),
@@ -83,24 +95,36 @@ export default function RoutePlannerMap({
       maxBoundsViscosity: 1.0,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-      maxZoom: 19,
-    }).addTo(map);
+    addDarkBasemap(map);
 
     map.setView(bounds.getCenter(), 12, { animate: false });
 
     const sensorLayer = L.layerGroup();
     sensors.forEach((s) => {
-      L.circleMarker([s.lat, s.lng], {
+      const marker = L.circleMarker([s.lat, s.lng], {
         radius: 3,
         fillColor: "#94a3b8",
         color: "rgba(0,0,0,0.2)",
         weight: 1,
         fillOpacity: 0.7,
-      })
-        .bindTooltip(`Sensor ${s.id}`, { direction: "top" })
-        .addTo(sensorLayer);
+      });
+
+      marker.bindTooltip(
+        `<div style="font-size:12px;line-height:1.4">
+          <strong>Sensor ${s.id}${s.sensor_id ? ` (${s.sensor_id})` : ""}</strong><br/>
+          ${s.name ? `<span style="color:#a1a1aa">${s.name}</span><br/>` : ""}
+          Speed: <strong>${s.avg_speed ? `${s.avg_speed.toFixed(1)} ${speedUnit}` : "-"}</strong><br/>
+          <span style="font-size:10px;color:#a1a1aa">Predicted corridor flow speed</span>
+        </div>`,
+        { direction: "top", offset: [0, -4] }
+      );
+
+      marker.on("click", (e) => {
+        L.DomEvent.stopPropagation(e);
+        onSelectRef.current(s);
+      });
+
+      marker.addTo(sensorLayer);
     });
     sensorLayer.addTo(map);
     sensorLayerRef.current = sensorLayer;
@@ -117,7 +141,7 @@ export default function RoutePlannerMap({
           best = s;
         }
       }
-      if (!best || bestMeters > 1500) return;
+      if (!best || bestMeters > 2500) return;
       onSelectRef.current(best);
     });
 
@@ -204,15 +228,26 @@ export default function RoutePlannerMap({
       let offset2 = 0;
 
       const step = () => {
+        if (!mapInstanceRef.current || !routeLayerRef.current) return;
         offset1 = (offset1 - 16) % 2000;
         offset2 = (offset2 + 12) % 2000;
-        escalator1.setStyle({ dashOffset: `${offset1}` });
-        escalator2.setStyle({ dashOffset: `${offset2}` });
-        animationRef.current = requestAnimationFrame(step);
+        try {
+          escalator1.setStyle({ dashOffset: `${offset1}` });
+          escalator2.setStyle({ dashOffset: `${offset2}` });
+          animationRef.current = requestAnimationFrame(step);
+        } catch {
+          // Ignore style updates if layer was removed
+        }
       };
 
       animationRef.current = requestAnimationFrame(step);
 
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
+        }
+      };
   }, [routeLatLngs]);
 
   return <div ref={mapRef} style={{ height, width: "100%", borderRadius: "var(--radius)" }} />;

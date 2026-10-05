@@ -2,11 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import L from "leaflet";
+import { addDarkBasemap } from "@/lib/map-basemap";
 import "leaflet/dist/leaflet.css";
 
 interface Sensor {
   id: number;
   sensor_id?: string;
+  name?: string;
+  corridor?: string;
   lat: number;
   lng: number;
   avg_speed: number;
@@ -19,6 +22,7 @@ interface TrafficMapProps {
   edges: [number, number][];
   height?: string;
   highlightSensorId?: number | null;
+  speedUnit?: string;
 }
 
 function getCongestionColor(c: number): string {
@@ -30,14 +34,25 @@ function getCongestionColor(c: number): string {
   return "#dc2626";
 }
 
-export default function TrafficMap({ sensors, edges, height = "520px", highlightSensorId = null }: TrafficMapProps) {
+export default function TrafficMap({
+  sensors,
+  edges,
+  height = "520px",
+  highlightSensorId = null,
+  speedUnit = "mph",
+}: TrafficMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const highlightLayerRef = useRef<L.Layer | null>(null);
 
   useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
+    if (!mapRef.current) return;
     if (!sensors.length) return;
+
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+    }
 
     // Compute center from actual sensor positions
     const avgLat = sensors.reduce((s, p) => s + p.lat, 0) / sensors.length;
@@ -49,10 +64,7 @@ export default function TrafficMap({ sensors, edges, height = "520px", highlight
       zoomControl: true,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-      maxZoom: 19,
-    }).addTo(map);
+    addDarkBasemap(map);
 
     // Sensor dots
     sensors.forEach((s) => {
@@ -65,8 +77,9 @@ export default function TrafficMap({ sensors, edges, height = "520px", highlight
       })
         .bindTooltip(
           `<div style="font-size:12px;line-height:1.5">
-            <strong>Sensor ${s.id}</strong><br/>
-            Speed: ${s.avg_speed.toFixed(1)} mph<br/>
+            <strong>Sensor ${s.id}${s.sensor_id ? ` (${s.sensor_id})` : ""}</strong><br/>
+            ${s.name ? `<span style="color:#a1a1aa">${s.name}</span><br/>` : ""}
+            Speed: ${s.avg_speed.toFixed(1)} ${speedUnit}<br/>
             Congestion: ${(s.congestion * 100).toFixed(0)}%
           </div>`,
           { direction: "top", offset: [0, -6] }
@@ -92,8 +105,11 @@ export default function TrafficMap({ sensors, edges, height = "520px", highlight
     legend.addTo(map);
 
     mapInstanceRef.current = map;
-    return () => { map.remove(); mapInstanceRef.current = null; };
-  }, [sensors, edges]);
+    return () => {
+      map.remove();
+      mapInstanceRef.current = null;
+    };
+  }, [sensors, edges, speedUnit]);
 
   useEffect(() => {
     const map = mapInstanceRef.current;
@@ -117,7 +133,13 @@ export default function TrafficMap({ sensors, edges, height = "520px", highlight
     }).addTo(map);
 
     highlightLayerRef.current = marker;
-    map.setView([sensor.lat, sensor.lng], Math.max(map.getZoom(), 12), { animate: true });
+    try {
+      if (map.getContainer()) {
+        map.setView([sensor.lat, sensor.lng], Math.max(map.getZoom(), 12), { animate: false });
+      }
+    } catch {
+      // safe fallback
+    }
   }, [highlightSensorId, sensors]);
 
   return <div ref={mapRef} style={{ height, width: "100%", borderRadius: "var(--radius)" }} />;

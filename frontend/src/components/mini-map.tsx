@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import L from "leaflet";
+import { addDarkBasemap } from "@/lib/map-basemap";
 import "leaflet/dist/leaflet.css";
 
 interface Sensor {
@@ -23,10 +24,15 @@ export default function MiniMap({ sensors, highlightIdx, height = "200px" }: Min
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.CircleMarker | null>(null);
 
-  // Create map once
+  // Create map on mount / sensor change
   useEffect(() => {
-    if (!ref.current || mapRef.current) return;
+    if (!ref.current) return;
     if (!sensors.length) return;
+
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
 
     const avgLat = sensors.reduce((s, p) => s + p.lat, 0) / sensors.length;
     const avgLng = sensors.reduce((s, p) => s + p.lng, 0) / sensors.length;
@@ -41,9 +47,7 @@ export default function MiniMap({ sensors, highlightIdx, height = "200px" }: Min
       doubleClickZoom: false,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 19,
-    }).addTo(map);
+    addDarkBasemap(map);
 
     // Light dots for all sensors
     sensors.forEach((s) => {
