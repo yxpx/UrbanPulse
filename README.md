@@ -99,14 +99,28 @@ python scripts/generate_heatmap_data.py
 python scripts/generate_sensor_locations.py
 ```
 
-### Mumbai Corridor Dataset (Cross-City Sandbox)
+### Mumbai Corridor Dataset & Forecasting Sandbox
 
 Synthesize the 50-sensor Mumbai arterial dataset and verify pipeline ingestion (see [`reports/mumbai_dataset_methodology.md`](reports/mumbai_dataset_methodology.md) and [`reports/mumbai_dataset_methodology.pdf`](reports/mumbai_dataset_methodology.pdf)):
 
 ```powershell
+# Step 1: Synthesize raw Mumbai HDF5, graph pickle, and weather CSV
 python scripts/mumbai/generate_mumbai_dataset.py
 python scripts/mumbai/verify_mumbai_dataset.py
+
+# Step 2: Generate frontend visualization bundles and run inference evaluation
+python scripts/mumbai/generate_mumbai_frontend_data.py
+python scripts/mumbai/verify_mumbai_frontend.py
+
+# Step 3: Run Next.js frontend with dual-city switcher (🇺🇸 LA ↔ 🇮🇳 Mumbai)
+cd frontend
+pnpm dev
 ```
+
+*Key Documentation:*
+- [`reports/mumbai_dataset_methodology.md`](reports/mumbai_dataset_methodology.md) & [`reports/mumbai_dataset_methodology.pdf`](reports/mumbai_dataset_methodology.pdf): Tripartite synthesis formulation, IRC:106 / HCM calibration, and academic citations.
+- [`reports/mumbai_48h_forecast_log.md`](reports/mumbai_48h_forecast_log.md): 48-hour forward chokepoint simulation, Santacruz precipitation spikes, and shockwave spillback analysis.
+- **Interactive Switcher:** Seamless UI toggle in sidebar dynamically switches maps, live Open-Meteo weather (LA vs. Mumbai Santacruz), units (`mph`/`°F` vs. `km/h`/`°C`), routing algorithms, and attribution profiles.
 
 ## Model Training
 

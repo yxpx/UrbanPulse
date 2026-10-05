@@ -60,7 +60,36 @@ Vehicular speed profiles are anchored in empirical studies published for Mumbai 
 - **Congestion Velocity ($v_{\text{cong}}$):** During the morning peak ($08:30 - 11:30$) Southbound and evening peak ($17:30 - 21:30$) Northbound, average travel speeds plunge to $14 - 22\text{ km/h}$, with recurring bottlenecks dropping to $8 - 12\text{ km/h}$ (TomTom Traffic Index 2023, MMRDA CTS-2).
 - **Asymmetric Tidal Flow:** Southbound direction exhibits heavy morning congestion into South Mumbai / BKC business districts; Northbound exhibits severe evening dispersal congestion toward residential suburbs (Andheri, Borivali, Thane).
 
-### 2.2 Mathematical Formulation of Temporal Speeds
+### 2.2 Empirical Velocity Profiles & Rush Hour Speed Attenuation
+Calibrated across 34,272 timesteps, the following empirical velocity levels and congestion attenuation profiles are exhibited during typical weekday operations:
+
+#### 2.2.1 City-Wide Network Velocity Profiles (All 50 Checkpoints)
+| Traffic Period | Time Window | Average Speed | Velocity Delta / Attenuation |
+| :--- | :--- | :--- | :--- |
+| **Late Night / Free-Flow** | 02:00 – 04:00 AM | **67.3 km/h** | *Baseline (Uncongested)* |
+| **Midday Inter-Peak** | 01:00 – 02:00 PM | **61.4 km/h** | $-8.8\%$ vs Free-Flow |
+| **Morning Rush Peak** | **~09:30 AM** | **22.2 km/h** | $\mathbf{-67.0\%}$ (Drops by ~45.1 km/h) |
+| **Evening Rush Peak** | **~07:00 PM** | **19.7 km/h** | $\mathbf{-70.7\%}$ (Drops by ~47.6 km/h) |
+
+#### 2.2.2 Corridor-Specific Rush Hour Attenuation (Weekday Means)
+| Corridor | Free-Flow Speed | Morning Peak (~9:30 AM) | Evening Peak (~7:00 PM) |
+| :--- | :--- | :--- | :--- |
+| **Western Express Highway (WEH)** | 73.5 km/h | **22.3 km/h** ($-69.6\%$) | **19.7 km/h** ($-73.2\%$) |
+| **Eastern Express Highway (EEH)** | 74.1 km/h | **22.9 km/h** ($-69.1\%$) | **20.1 km/h** ($-72.9\%$) |
+| **Jogeshwari-Vikhroli Link Road (JVLR)** | 58.0 km/h | **13.9 km/h** ($-76.0\%$) | **12.2 km/h** ($-79.0\%$) |
+| **Santacruz-Chembur Link Road (SCLR)** | 52.3 km/h | **12.4 km/h** ($-76.3\%$) | **11.2 km/h** ($-78.7\%$) |
+| **South Western Arterial** | 62.8 km/h | **41.0 km/h** ($-34.7\%$) | **37.9 km/h** ($-39.7\%$) |
+
+#### 2.2.3 Critical Bottleneck Junctions (Peak Hour Minimums)
+| Bottleneck Station | Sensor ID | Free-Flow | Morning Peak (09:30) | Evening Peak (19:00) | Crawl Floor |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **WEH – Bandra Kalanagar Junction** | `1015` | 64.5 km/h | **9.8 km/h** ($-84.9\%$) | **9.3 km/h** ($-85.5\%$) | 5.0 km/h |
+| **EEH – Chheda Nagar Junction** | `1027` | 64.7 km/h | **9.2 km/h** ($-85.8\%$) | **9.1 km/h** ($-85.9\%$) | 5.0 km/h |
+| **SCLR – Kurla Double-Decker Flyover** | `1047` | 49.6 km/h | **7.4 km/h** ($-85.0\%$) | **7.7 km/h** ($-84.5\%$) | 5.0 km/h |
+| **JVLR – SEEPZ / Powai Entry** | `1039` | 54.3 km/h | **8.3 km/h** ($-84.7\%$) | **8.0 km/h** ($-85.4\%$) | 5.0 km/h |
+| **WEH – Jogeshwari JVLR Interchange** | `1009` | 69.6 km/h | **10.4 km/h** ($-85.1\%$) | **9.9 km/h** ($-85.7\%$) | 5.0 km/h |
+
+### 2.3 Mathematical Formulation of Temporal Speeds
 For each sensor node $i$ at 5-minute time step $t \in [0, T]$:
 
 $$v_i(t) = v_{f, i} \cdot \left[ 1 - C_i(t) \right] \cdot \Phi_{\text{weather}}(t) + \eta_i(t)$$
@@ -73,7 +102,7 @@ Where:
 3. **$\Phi_{\text{weather}}(t) \in [0.65, 1.0]$:** Meteorological attenuation coefficient (detailed in Section 3).
 4. **$\eta_i(t) \sim \mathcal{N}(0, \sigma_{\text{noise}}^2)$:** Spatially correlated autoregressive residual perturbation representing minute-by-minute stochastic vehicular fluctuations ($AR(1)$ process: $\eta_t = \rho \eta_{t-1} + \epsilon_t, \rho = 0.72$).
 
-### 2.3 Upstream Shockwave Propagation (LWR Model)
+### 2.4 Upstream Shockwave Propagation (LWR Model)
 To satisfy the kinematic wave theory of traffic flow (Lighthill & Whitham, 1955; Richards, 1956), when a downstream node (e.g., Kalanagar junction bottleneck) experiences sudden deceleration, congestion propagates upstream against the direction of travel at shockwave speed $w_s \approx 15 - 20\text{ km/h}$:
 
 $$\frac{\partial k}{\partial t} + \frac{\partial q}{\partial x} = 0$$
