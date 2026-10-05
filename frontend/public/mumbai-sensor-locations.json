@@ -1,0 +1,1402 @@
+{
+  "sensors": [
+    {
+      "id": 0,
+      "sensor_id": "1001",
+      "name": "WEH - Dahisar Toll Plaza",
+      "corridor": "WEH",
+      "lat": 19.25783,
+      "lng": 72.87173,
+      "avg_speed": 58.63,
+      "congestion": 0.042,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 0.0
+    },
+    {
+      "id": 1,
+      "sensor_id": "1002",
+      "name": "WEH - Borivali IC Colony",
+      "corridor": "WEH",
+      "lat": 19.24444,
+      "lng": 72.86458,
+      "avg_speed": 58.67,
+      "congestion": 0.041,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 2.1
+    },
+    {
+      "id": 2,
+      "sensor_id": "1003",
+      "name": "WEH - Borivali National Park",
+      "corridor": "WEH",
+      "lat": 19.22868,
+      "lng": 72.86341,
+      "avg_speed": 58.62,
+      "congestion": 0.043,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 3.9
+    },
+    {
+      "id": 3,
+      "sensor_id": "1004",
+      "name": "WEH - Kandivali Samata Nagar",
+      "corridor": "WEH",
+      "lat": 19.21389,
+      "lng": 72.86806,
+      "avg_speed": 58.68,
+      "congestion": 0.04,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 5.8
+    },
+    {
+      "id": 4,
+      "sensor_id": "1005",
+      "name": "WEH - Kandivali Flyover",
+      "corridor": "WEH",
+      "lat": 19.2009,
+      "lng": 72.86134,
+      "avg_speed": 58.62,
+      "congestion": 0.042,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 7.4
+    },
+    {
+      "id": 5,
+      "sensor_id": "1006",
+      "name": "WEH - Malad Pushpa Park",
+      "corridor": "WEH",
+      "lat": 19.18548,
+      "lng": 72.85851,
+      "avg_speed": 54.92,
+      "congestion": 0.173,
+      "color": "#22c55e",
+      "v_free": 75.0,
+      "km": 9.2
+    },
+    {
+      "id": 6,
+      "sensor_id": "1007",
+      "name": "WEH - Goregaon Hub Mall",
+      "corridor": "WEH",
+      "lat": 19.17024,
+      "lng": 72.85905,
+      "avg_speed": 55.0,
+      "congestion": 0.17,
+      "color": "#22c55e",
+      "v_free": 75.0,
+      "km": 11.0
+    },
+    {
+      "id": 7,
+      "sensor_id": "1008",
+      "name": "WEH - Aarey Colony Exit",
+      "corridor": "WEH",
+      "lat": 19.15482,
+      "lng": 72.85698,
+      "avg_speed": 54.88,
+      "congestion": 0.174,
+      "color": "#22c55e",
+      "v_free": 75.0,
+      "km": 12.8
+    },
+    {
+      "id": 8,
+      "sensor_id": "1009",
+      "name": "WEH - Jogeshwari JVLR Jn",
+      "corridor": "WEH",
+      "lat": 19.139,
+      "lng": 72.85495,
+      "avg_speed": 45.95,
+      "congestion": 0.489,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 14.6
+    },
+    {
+      "id": 9,
+      "sensor_id": "1010",
+      "name": "WEH - Andheri Gundavali",
+      "corridor": "WEH",
+      "lat": 19.12353,
+      "lng": 72.85667,
+      "avg_speed": 51.22,
+      "congestion": 0.303,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 16.4
+    },
+    {
+      "id": 10,
+      "sensor_id": "1011",
+      "name": "WEH - Vile Parle Airport",
+      "corridor": "WEH",
+      "lat": 19.10827,
+      "lng": 72.85362,
+      "avg_speed": 55.06,
+      "congestion": 0.168,
+      "color": "#22c55e",
+      "v_free": 75.0,
+      "km": 18.2
+    },
+    {
+      "id": 11,
+      "sensor_id": "1012",
+      "name": "WEH - Santacruz Milan Flyover",
+      "corridor": "WEH",
+      "lat": 19.09354,
+      "lng": 72.85133,
+      "avg_speed": 51.26,
+      "congestion": 0.302,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 19.9
+    },
+    {
+      "id": 12,
+      "sensor_id": "1013",
+      "name": "WEH - Vakola SCLR Jn",
+      "corridor": "WEH",
+      "lat": 19.08376,
+      "lng": 72.84644,
+      "avg_speed": 51.3,
+      "congestion": 0.3,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 21.2
+    },
+    {
+      "id": 13,
+      "sensor_id": "1014",
+      "name": "WEH - Khar Teachers Colony",
+      "corridor": "WEH",
+      "lat": 19.06824,
+      "lng": 72.84675,
+      "avg_speed": 51.14,
+      "congestion": 0.306,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 22.9
+    },
+    {
+      "id": 14,
+      "sensor_id": "1015",
+      "name": "WEH - Bandra Kalanagar",
+      "corridor": "WEH",
+      "lat": 19.05282,
+      "lng": 72.84542,
+      "avg_speed": 40.84,
+      "congestion": 0.668,
+      "color": "#f97316",
+      "v_free": 65.0,
+      "km": 24.6
+    },
+    {
+      "id": 15,
+      "sensor_id": "1016",
+      "name": "WEH - Mahim Causeway North",
+      "corridor": "WEH",
+      "lat": 19.04283,
+      "lng": 72.83915,
+      "avg_speed": 51.28,
+      "congestion": 0.301,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 25.8
+    },
+    {
+      "id": 16,
+      "sensor_id": "1017",
+      "name": "EEH - Anand Nagar Toll Thane",
+      "corridor": "EEH",
+      "lat": 19.19843,
+      "lng": 72.96932,
+      "avg_speed": 58.6,
+      "congestion": 0.043,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 0.0
+    },
+    {
+      "id": 17,
+      "sensor_id": "1018",
+      "name": "EEH - Mulund Check Naka",
+      "corridor": "EEH",
+      "lat": 19.18895,
+      "lng": 72.96462,
+      "avg_speed": 58.65,
+      "congestion": 0.042,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 1.7
+    },
+    {
+      "id": 18,
+      "sensor_id": "1019",
+      "name": "EEH - Mulund Airoli Jn",
+      "corridor": "EEH",
+      "lat": 19.17408,
+      "lng": 72.96864,
+      "avg_speed": 58.64,
+      "congestion": 0.042,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 3.6
+    },
+    {
+      "id": 19,
+      "sensor_id": "1020",
+      "name": "EEH - Nahur Flyover",
+      "corridor": "EEH",
+      "lat": 19.16006,
+      "lng": 72.96071,
+      "avg_speed": 58.74,
+      "congestion": 0.039,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 5.4
+    },
+    {
+      "id": 20,
+      "sensor_id": "1021",
+      "name": "EEH - Bhandup Sonapur",
+      "corridor": "EEH",
+      "lat": 19.1499,
+      "lng": 72.95387,
+      "avg_speed": 58.64,
+      "congestion": 0.042,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 6.9
+    },
+    {
+      "id": 21,
+      "sensor_id": "1022",
+      "name": "EEH - Kanjurmarg Flyover",
+      "corridor": "EEH",
+      "lat": 19.13619,
+      "lng": 72.94548,
+      "avg_speed": 58.57,
+      "congestion": 0.044,
+      "color": "#22c55e",
+      "v_free": 80.0,
+      "km": 8.8
+    },
+    {
+      "id": 22,
+      "sensor_id": "1023",
+      "name": "EEH - Vikhroli JVLR Jn",
+      "corridor": "EEH",
+      "lat": 19.12073,
+      "lng": 72.9373,
+      "avg_speed": 55.05,
+      "congestion": 0.168,
+      "color": "#22c55e",
+      "v_free": 75.0,
+      "km": 10.9
+    },
+    {
+      "id": 23,
+      "sensor_id": "1024",
+      "name": "EEH - Vikhroli Godrej Colony",
+      "corridor": "EEH",
+      "lat": 19.10485,
+      "lng": 72.93074,
+      "avg_speed": 54.91,
+      "congestion": 0.173,
+      "color": "#22c55e",
+      "v_free": 75.0,
+      "km": 12.9
+    },
+    {
+      "id": 24,
+      "sensor_id": "1025",
+      "name": "EEH - Ghatkopar Pantnagar",
+      "corridor": "EEH",
+      "lat": 19.08989,
+      "lng": 72.92463,
+      "avg_speed": 54.92,
+      "congestion": 0.173,
+      "color": "#22c55e",
+      "v_free": 75.0,
+      "km": 14.8
+    },
+    {
+      "id": 25,
+      "sensor_id": "1026",
+      "name": "EEH - Ghatkopar Ramabai Nagar",
+      "corridor": "EEH",
+      "lat": 19.07956,
+      "lng": 72.91715,
+      "avg_speed": 51.26,
+      "congestion": 0.302,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 16.3
+    },
+    {
+      "id": 26,
+      "sensor_id": "1027",
+      "name": "EEH - Chheda Nagar Bottleneck",
+      "corridor": "EEH",
+      "lat": 19.06711,
+      "lng": 72.90188,
+      "avg_speed": 41.36,
+      "congestion": 0.65,
+      "color": "#f97316",
+      "v_free": 65.0,
+      "km": 18.3
+    },
+    {
+      "id": 27,
+      "sensor_id": "1028",
+      "name": "EEH - Amar Mahal Junction",
+      "corridor": "EEH",
+      "lat": 19.05887,
+      "lng": 72.89014,
+      "avg_speed": 47.46,
+      "congestion": 0.435,
+      "color": "#eab308",
+      "v_free": 65.0,
+      "km": 19.8
+    },
+    {
+      "id": 28,
+      "sensor_id": "1029",
+      "name": "EEH - Chunabhatti Everard Nagar",
+      "corridor": "EEH",
+      "lat": 19.05064,
+      "lng": 72.87485,
+      "avg_speed": 51.24,
+      "congestion": 0.302,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 21.6
+    },
+    {
+      "id": 29,
+      "sensor_id": "1030",
+      "name": "EEH - Sion Circle North",
+      "corridor": "EEH",
+      "lat": 19.04267,
+      "lng": 72.86346,
+      "avg_speed": 51.33,
+      "congestion": 0.299,
+      "color": "#eab308",
+      "v_free": 70.0,
+      "km": 23.0
+    },
+    {
+      "id": 30,
+      "sensor_id": "1031",
+      "name": "South - Bandra West Hill Rd",
+      "corridor": "BWSL",
+      "lat": 19.05506,
+      "lng": 72.83482,
+      "avg_speed": 51.24,
+      "congestion": 0.302,
+      "color": "#eab308",
+      "v_free": 60.0,
+      "km": 0.0
+    },
+    {
+      "id": 31,
+      "sensor_id": "1032",
+      "name": "South - Mahim Western Arterial",
+      "corridor": "BWSL",
+      "lat": 19.02999,
+      "lng": 72.84176,
+      "avg_speed": 55.54,
+      "congestion": 0.151,
+      "color": "#22c55e",
+      "v_free": 65.0,
+      "km": 3.0
+    },
+    {
+      "id": 32,
+      "sensor_id": "1033",
+      "name": "South - Prabhadevi Worli Naka",
+      "corridor": "BWSL",
+      "lat": 19.00618,
+      "lng": 72.84052,
+      "avg_speed": 51.22,
+      "congestion": 0.303,
+      "color": "#eab308",
+      "v_free": 60.0,
+      "km": 5.8
+    },
+    {
+      "id": 33,
+      "sensor_id": "1034",
+      "name": "South - Mahalaxmi Racecourse",
+      "corridor": "BWSL",
+      "lat": 18.97708,
+      "lng": 72.83363,
+      "avg_speed": 55.57,
+      "congestion": 0.15,
+      "color": "#22c55e",
+      "v_free": 65.0,
+      "km": 9.2
+    },
+    {
+      "id": 34,
+      "sensor_id": "1035",
+      "name": "South - Pedder Road Girgaon",
+      "corridor": "BWSL",
+      "lat": 18.94875,
+      "lng": 72.82891,
+      "avg_speed": 51.25,
+      "congestion": 0.302,
+      "color": "#eab308",
+      "v_free": 60.0,
+      "km": 12.6
+    },
+    {
+      "id": 35,
+      "sensor_id": "1036",
+      "name": "South - Marine Drive Promenade",
+      "corridor": "BWSL",
+      "lat": 18.92715,
+      "lng": 72.82598,
+      "avg_speed": 59.83,
+      "congestion": 0.0,
+      "color": "#22c55e",
+      "v_free": 70.0,
+      "km": 15.2
+    },
+    {
+      "id": 36,
+      "sensor_id": "1037",
+      "name": "JVLR - WEH Junction Start",
+      "corridor": "JVLR",
+      "lat": 19.139,
+      "lng": 72.85504,
+      "avg_speed": 42.45,
+      "congestion": 0.611,
+      "color": "#f97316",
+      "v_free": 60.0,
+      "km": 0.0
+    },
+    {
+      "id": 37,
+      "sensor_id": "1038",
+      "name": "JVLR - Majas Depot Jogeshwari",
+      "corridor": "JVLR",
+      "lat": 19.13974,
+      "lng": 72.86681,
+      "avg_speed": 42.46,
+      "congestion": 0.611,
+      "color": "#f97316",
+      "v_free": 60.0,
+      "km": 1.4
+    },
+    {
+      "id": 38,
+      "sensor_id": "1039",
+      "name": "JVLR - SEEPZ Andheri East",
+      "corridor": "JVLR",
+      "lat": 19.12996,
+      "lng": 72.87792,
+      "avg_speed": 34.44,
+      "congestion": 0.893,
+      "color": "#ef4444",
+      "v_free": 55.0,
+      "km": 3.0
+    },
+    {
+      "id": 39,
+      "sensor_id": "1040",
+      "name": "JVLR - Powai Lake Promenade",
+      "corridor": "JVLR",
+      "lat": 19.12462,
+      "lng": 72.89608,
+      "avg_speed": 38.96,
+      "congestion": 0.734,
+      "color": "#ef4444",
+      "v_free": 55.0,
+      "km": 5.0
+    },
+    {
+      "id": 40,
+      "sensor_id": "1041",
+      "name": "JVLR - IIT Bombay Main Gate",
+      "corridor": "JVLR",
+      "lat": 19.12404,
+      "lng": 72.90969,
+      "avg_speed": 42.63,
+      "congestion": 0.605,
+      "color": "#f97316",
+      "v_free": 60.0,
+      "km": 6.5
+    },
+    {
+      "id": 41,
+      "sensor_id": "1042",
+      "name": "JVLR - Gandhi Nagar Flyover",
+      "corridor": "JVLR",
+      "lat": 19.12569,
+      "lng": 72.9228,
+      "avg_speed": 42.57,
+      "congestion": 0.607,
+      "color": "#f97316",
+      "v_free": 60.0,
+      "km": 7.9
+    },
+    {
+      "id": 42,
+      "sensor_id": "1043",
+      "name": "JVLR - EEH Junction End",
+      "corridor": "JVLR",
+      "lat": 19.12073,
+      "lng": 72.9373,
+      "avg_speed": 42.53,
+      "congestion": 0.609,
+      "color": "#f97316",
+      "v_free": 60.0,
+      "km": 9.5
+    },
+    {
+      "id": 43,
+      "sensor_id": "1044",
+      "name": "SCLR - WEH Milan / Vakola Start",
+      "corridor": "SCLR",
+      "lat": 19.08376,
+      "lng": 72.84644,
+      "avg_speed": 39.05,
+      "congestion": 0.731,
+      "color": "#ef4444",
+      "v_free": 55.0,
+      "km": 0.0
+    },
+    {
+      "id": 44,
+      "sensor_id": "1045",
+      "name": "SCLR - Vakola Junction East",
+      "corridor": "SCLR",
+      "lat": 19.07398,
+      "lng": 72.85204,
+      "avg_speed": 35.48,
+      "congestion": 0.857,
+      "color": "#ef4444",
+      "v_free": 50.0,
+      "km": 1.3
+    },
+    {
+      "id": 45,
+      "sensor_id": "1046",
+      "name": "SCLR - BKC Connector Jn",
+      "corridor": "SCLR",
+      "lat": 19.0713,
+      "lng": 72.8635,
+      "avg_speed": 35.51,
+      "congestion": 0.856,
+      "color": "#ef4444",
+      "v_free": 50.0,
+      "km": 2.6
+    },
+    {
+      "id": 46,
+      "sensor_id": "1047",
+      "name": "SCLR - Kurla Double Decker",
+      "corridor": "SCLR",
+      "lat": 19.07635,
+      "lng": 72.87691,
+      "avg_speed": 31.41,
+      "congestion": 1.0,
+      "color": "#ef4444",
+      "v_free": 50.0,
+      "km": 4.1
+    },
+    {
+      "id": 47,
+      "sensor_id": "1048",
+      "name": "SCLR - Nehru Nagar Kurla",
+      "corridor": "SCLR",
+      "lat": 19.06857,
+      "lng": 72.88793,
+      "avg_speed": 38.95,
+      "congestion": 0.735,
+      "color": "#ef4444",
+      "v_free": 55.0,
+      "km": 5.4
+    },
+    {
+      "id": 48,
+      "sensor_id": "1049",
+      "name": "SCLR - Tilak Nagar ROB",
+      "corridor": "SCLR",
+      "lat": 19.06656,
+      "lng": 72.90058,
+      "avg_speed": 39.11,
+      "congestion": 0.729,
+      "color": "#ef4444",
+      "v_free": 55.0,
+      "km": 6.8
+    },
+    {
+      "id": 49,
+      "sensor_id": "1050",
+      "name": "SCLR - Chheda Nagar EEH End",
+      "corridor": "SCLR",
+      "lat": 19.06713,
+      "lng": 72.90192,
+      "avg_speed": 39.01,
+      "congestion": 0.733,
+      "color": "#ef4444",
+      "v_free": 55.0,
+      "km": 7.1
+    }
+  ],
+  "edges": [
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      2,
+      5
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      3,
+      5
+    ],
+    [
+      3,
+      6
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      4,
+      6
+    ],
+    [
+      4,
+      7
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      5,
+      7
+    ],
+    [
+      5,
+      8
+    ],
+    [
+      6,
+      7
+    ],
+    [
+      6,
+      8
+    ],
+    [
+      6,
+      9
+    ],
+    [
+      6,
+      36
+    ],
+    [
+      6,
+      37
+    ],
+    [
+      7,
+      8
+    ],
+    [
+      7,
+      9
+    ],
+    [
+      7,
+      10
+    ],
+    [
+      7,
+      36
+    ],
+    [
+      7,
+      37
+    ],
+    [
+      7,
+      38
+    ],
+    [
+      8,
+      9
+    ],
+    [
+      8,
+      10
+    ],
+    [
+      8,
+      11
+    ],
+    [
+      8,
+      36
+    ],
+    [
+      8,
+      37
+    ],
+    [
+      8,
+      38
+    ],
+    [
+      8,
+      39
+    ],
+    [
+      9,
+      10
+    ],
+    [
+      9,
+      11
+    ],
+    [
+      9,
+      12
+    ],
+    [
+      9,
+      36
+    ],
+    [
+      9,
+      37
+    ],
+    [
+      9,
+      38
+    ],
+    [
+      9,
+      43
+    ],
+    [
+      10,
+      11
+    ],
+    [
+      10,
+      12
+    ],
+    [
+      10,
+      13
+    ],
+    [
+      10,
+      36
+    ],
+    [
+      10,
+      37
+    ],
+    [
+      10,
+      43
+    ],
+    [
+      10,
+      44
+    ],
+    [
+      11,
+      12
+    ],
+    [
+      11,
+      13
+    ],
+    [
+      11,
+      14
+    ],
+    [
+      11,
+      43
+    ],
+    [
+      11,
+      44
+    ],
+    [
+      11,
+      45
+    ],
+    [
+      12,
+      13
+    ],
+    [
+      12,
+      14
+    ],
+    [
+      12,
+      15
+    ],
+    [
+      12,
+      30
+    ],
+    [
+      12,
+      43
+    ],
+    [
+      12,
+      44
+    ],
+    [
+      12,
+      45
+    ],
+    [
+      12,
+      46
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      13,
+      15
+    ],
+    [
+      13,
+      30
+    ],
+    [
+      13,
+      43
+    ],
+    [
+      13,
+      44
+    ],
+    [
+      13,
+      45
+    ],
+    [
+      14,
+      15
+    ],
+    [
+      14,
+      30
+    ],
+    [
+      14,
+      31
+    ],
+    [
+      14,
+      43
+    ],
+    [
+      14,
+      44
+    ],
+    [
+      15,
+      30
+    ],
+    [
+      15,
+      31
+    ],
+    [
+      15,
+      43
+    ],
+    [
+      16,
+      17
+    ],
+    [
+      16,
+      18
+    ],
+    [
+      16,
+      19
+    ],
+    [
+      17,
+      18
+    ],
+    [
+      17,
+      19
+    ],
+    [
+      17,
+      20
+    ],
+    [
+      18,
+      19
+    ],
+    [
+      18,
+      20
+    ],
+    [
+      18,
+      21
+    ],
+    [
+      19,
+      20
+    ],
+    [
+      19,
+      21
+    ],
+    [
+      19,
+      22
+    ],
+    [
+      19,
+      42
+    ],
+    [
+      20,
+      21
+    ],
+    [
+      20,
+      22
+    ],
+    [
+      20,
+      42
+    ],
+    [
+      21,
+      22
+    ],
+    [
+      21,
+      23
+    ],
+    [
+      21,
+      40
+    ],
+    [
+      21,
+      41
+    ],
+    [
+      21,
+      42
+    ],
+    [
+      22,
+      23
+    ],
+    [
+      22,
+      24
+    ],
+    [
+      22,
+      25
+    ],
+    [
+      22,
+      39
+    ],
+    [
+      22,
+      40
+    ],
+    [
+      22,
+      41
+    ],
+    [
+      22,
+      42
+    ],
+    [
+      23,
+      24
+    ],
+    [
+      23,
+      25
+    ],
+    [
+      23,
+      26
+    ],
+    [
+      23,
+      40
+    ],
+    [
+      23,
+      41
+    ],
+    [
+      23,
+      42
+    ],
+    [
+      24,
+      25
+    ],
+    [
+      24,
+      26
+    ],
+    [
+      24,
+      27
+    ],
+    [
+      24,
+      42
+    ],
+    [
+      24,
+      47
+    ],
+    [
+      24,
+      48
+    ],
+    [
+      24,
+      49
+    ],
+    [
+      25,
+      26
+    ],
+    [
+      25,
+      27
+    ],
+    [
+      25,
+      28
+    ],
+    [
+      25,
+      47
+    ],
+    [
+      25,
+      48
+    ],
+    [
+      25,
+      49
+    ],
+    [
+      26,
+      27
+    ],
+    [
+      26,
+      28
+    ],
+    [
+      26,
+      29
+    ],
+    [
+      26,
+      45
+    ],
+    [
+      26,
+      46
+    ],
+    [
+      26,
+      47
+    ],
+    [
+      26,
+      48
+    ],
+    [
+      26,
+      49
+    ],
+    [
+      27,
+      28
+    ],
+    [
+      27,
+      29
+    ],
+    [
+      27,
+      46
+    ],
+    [
+      27,
+      47
+    ],
+    [
+      27,
+      48
+    ],
+    [
+      27,
+      49
+    ],
+    [
+      28,
+      29
+    ],
+    [
+      28,
+      47
+    ],
+    [
+      28,
+      48
+    ],
+    [
+      28,
+      49
+    ],
+    [
+      29,
+      48
+    ],
+    [
+      29,
+      49
+    ],
+    [
+      30,
+      31
+    ],
+    [
+      30,
+      32
+    ],
+    [
+      30,
+      43
+    ],
+    [
+      31,
+      32
+    ],
+    [
+      32,
+      33
+    ],
+    [
+      33,
+      34
+    ],
+    [
+      34,
+      35
+    ],
+    [
+      36,
+      37
+    ],
+    [
+      36,
+      38
+    ],
+    [
+      36,
+      39
+    ],
+    [
+      37,
+      38
+    ],
+    [
+      37,
+      39
+    ],
+    [
+      37,
+      40
+    ],
+    [
+      38,
+      39
+    ],
+    [
+      38,
+      40
+    ],
+    [
+      38,
+      41
+    ],
+    [
+      39,
+      40
+    ],
+    [
+      39,
+      41
+    ],
+    [
+      39,
+      42
+    ],
+    [
+      40,
+      41
+    ],
+    [
+      40,
+      42
+    ],
+    [
+      41,
+      42
+    ],
+    [
+      43,
+      44
+    ],
+    [
+      43,
+      45
+    ],
+    [
+      43,
+      46
+    ],
+    [
+      43,
+      47
+    ],
+    [
+      44,
+      45
+    ],
+    [
+      44,
+      46
+    ],
+    [
+      44,
+      47
+    ],
+    [
+      45,
+      46
+    ],
+    [
+      45,
+      47
+    ],
+    [
+      45,
+      48
+    ],
+    [
+      45,
+      49
+    ],
+    [
+      46,
+      47
+    ],
+    [
+      46,
+      48
+    ],
+    [
+      46,
+      49
+    ],
+    [
+      47,
+      48
+    ],
+    [
+      47,
+      49
+    ],
+    [
+      48,
+      49
+    ]
+  ],
+  "city": "Mumbai",
+  "corridors": [
+    "WEH",
+    "EEH",
+    "BWSL",
+    "JVLR",
+    "SCLR"
+  ],
+  "n_sensors": 50,
+  "n_edges": 184
+}

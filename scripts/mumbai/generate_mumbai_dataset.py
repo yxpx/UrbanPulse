@@ -23,65 +23,65 @@ os.makedirs(RAW_DIR, exist_ok=True)
 # 1. Corridor & Sensor Definitions (50 Checkpoints across 5 Corridors)
 # ----------------------------------------------------------------------
 SENSORS = [
-    # --- Western Express Highway (WEH: Dahisar -> Bandra) ---
-    {"id": "1001", "name": "WEH - Dahisar Toll Plaza", "corridor": "WEH", "lat": 19.2550, "lng": 72.8625, "v_free": 80.0, "km": 0.0},
-    {"id": "1002", "name": "WEH - Borivali National Park", "corridor": "WEH", "lat": 19.2310, "lng": 72.8600, "v_free": 80.0, "km": 2.7},
-    {"id": "1003", "name": "WEH - Kandivali Flyover", "corridor": "WEH", "lat": 19.2080, "lng": 72.8580, "v_free": 80.0, "km": 5.3},
-    {"id": "1004", "name": "WEH - Malad Pushpa Park", "corridor": "WEH", "lat": 19.1860, "lng": 72.8550, "v_free": 75.0, "km": 7.8},
-    {"id": "1005", "name": "WEH - Goregaon Hub Mall", "corridor": "WEH", "lat": 19.1620, "lng": 72.8530, "v_free": 75.0, "km": 10.5},
-    {"id": "1006", "name": "WEH - Aarey Colony Exit", "corridor": "WEH", "lat": 19.1480, "lng": 72.8520, "v_free": 75.0, "km": 12.1},
-    {"id": "1007", "name": "WEH - Jogeshwari JVLR Jn", "corridor": "WEH", "lat": 19.1350, "lng": 72.8510, "v_free": 70.0, "km": 13.6},
-    {"id": "1008", "name": "WEH - Andheri Flyover", "corridor": "WEH", "lat": 19.1190, "lng": 72.8490, "v_free": 70.0, "km": 15.4},
-    {"id": "1009", "name": "WEH - Vile Parle Airport", "corridor": "WEH", "lat": 19.0980, "lng": 72.8480, "v_free": 75.0, "km": 17.8},
-    {"id": "1010", "name": "WEH - Santacruz Milan Flyover", "corridor": "WEH", "lat": 19.0830, "lng": 72.8460, "v_free": 70.0, "km": 19.5},
-    {"id": "1011", "name": "WEH - Khar Subway Jn", "corridor": "WEH", "lat": 19.0700, "lng": 72.8440, "v_free": 70.0, "km": 21.0},
-    {"id": "1012", "name": "WEH - Bandra Teachers Colony", "corridor": "WEH", "lat": 19.0610, "lng": 72.8430, "v_free": 70.0, "km": 22.1},
-    {"id": "1013", "name": "WEH - Kalanagar Chokepoint", "corridor": "WEH", "lat": 19.0550, "lng": 72.8460, "v_free": 65.0, "km": 22.9},
-    {"id": "1014", "name": "WEH - BKC Connector Entry", "corridor": "WEH", "lat": 19.0570, "lng": 72.8550, "v_free": 65.0, "km": 23.9},
-    {"id": "1015", "name": "WEH - Bandra Terminus", "corridor": "WEH", "lat": 19.0510, "lng": 72.8410, "v_free": 70.0, "km": 24.6},
-    {"id": "1016", "name": "WEH - Mahim Causeway North", "corridor": "WEH", "lat": 19.0430, "lng": 72.8390, "v_free": 70.0, "km": 25.5},
+    # --- Western Express Highway (WEH: Dahisar -> Mahim, 16 Checkpoints) ---
+    {"id": "1001", "name": "WEH - Dahisar Toll Plaza", "corridor": "WEH", "lat": 19.25783, "lng": 72.87173, "v_free": 80.0, "km": 0.0},
+    {"id": "1002", "name": "WEH - Borivali IC Colony", "corridor": "WEH", "lat": 19.24444, "lng": 72.86458, "v_free": 80.0, "km": 2.1},
+    {"id": "1003", "name": "WEH - Borivali National Park", "corridor": "WEH", "lat": 19.22868, "lng": 72.86341, "v_free": 80.0, "km": 3.9},
+    {"id": "1004", "name": "WEH - Kandivali Samata Nagar", "corridor": "WEH", "lat": 19.21389, "lng": 72.86806, "v_free": 80.0, "km": 5.8},
+    {"id": "1005", "name": "WEH - Kandivali Flyover", "corridor": "WEH", "lat": 19.20090, "lng": 72.86134, "v_free": 80.0, "km": 7.4},
+    {"id": "1006", "name": "WEH - Malad Pushpa Park", "corridor": "WEH", "lat": 19.18548, "lng": 72.85851, "v_free": 75.0, "km": 9.2},
+    {"id": "1007", "name": "WEH - Goregaon Hub Mall", "corridor": "WEH", "lat": 19.17024, "lng": 72.85905, "v_free": 75.0, "km": 11.0},
+    {"id": "1008", "name": "WEH - Aarey Colony Exit", "corridor": "WEH", "lat": 19.15482, "lng": 72.85698, "v_free": 75.0, "km": 12.8},
+    {"id": "1009", "name": "WEH - Jogeshwari JVLR Jn", "corridor": "WEH", "lat": 19.13900, "lng": 72.85495, "v_free": 70.0, "km": 14.6},
+    {"id": "1010", "name": "WEH - Andheri Gundavali", "corridor": "WEH", "lat": 19.12353, "lng": 72.85667, "v_free": 70.0, "km": 16.4},
+    {"id": "1011", "name": "WEH - Vile Parle Airport", "corridor": "WEH", "lat": 19.10827, "lng": 72.85362, "v_free": 75.0, "km": 18.2},
+    {"id": "1012", "name": "WEH - Santacruz Milan Flyover", "corridor": "WEH", "lat": 19.09354, "lng": 72.85133, "v_free": 70.0, "km": 19.9},
+    {"id": "1013", "name": "WEH - Vakola SCLR Jn", "corridor": "WEH", "lat": 19.08376, "lng": 72.84644, "v_free": 70.0, "km": 21.2},
+    {"id": "1014", "name": "WEH - Khar Teachers Colony", "corridor": "WEH", "lat": 19.06824, "lng": 72.84675, "v_free": 70.0, "km": 22.9},
+    {"id": "1015", "name": "WEH - Bandra Kalanagar", "corridor": "WEH", "lat": 19.05282, "lng": 72.84542, "v_free": 65.0, "km": 24.6},
+    {"id": "1016", "name": "WEH - Mahim Causeway North", "corridor": "WEH", "lat": 19.04283, "lng": 72.83915, "v_free": 70.0, "km": 25.8},
 
-    # --- Eastern Express Highway (EEH: Thane -> Sion) ---
-    {"id": "1017", "name": "EEH - Anand Nagar Toll Thane", "corridor": "EEH", "lat": 19.1980, "lng": 72.9690, "v_free": 80.0, "km": 0.0},
-    {"id": "1018", "name": "EEH - Mulund Check Naka", "corridor": "EEH", "lat": 19.1800, "lng": 72.9620, "v_free": 80.0, "km": 2.1},
-    {"id": "1019", "name": "EEH - Bhandup Sonapur", "corridor": "EEH", "lat": 19.1570, "lng": 72.9490, "v_free": 80.0, "km": 4.9},
-    {"id": "1020", "name": "EEH - Kanjurmarg Flyover", "corridor": "EEH", "lat": 19.1350, "lng": 72.9370, "v_free": 80.0, "km": 7.5},
-    {"id": "1021", "name": "EEH - Vikhroli JVLR Jn", "corridor": "EEH", "lat": 19.1160, "lng": 72.9280, "v_free": 75.0, "km": 9.8},
-    {"id": "1022", "name": "EEH - Ghatkopar Pantnagar", "corridor": "EEH", "lat": 19.0920, "lng": 72.9150, "v_free": 75.0, "km": 12.8},
-    {"id": "1023", "name": "EEH - Chedda Nagar Bottleneck", "corridor": "EEH", "lat": 19.0740, "lng": 72.9020, "v_free": 65.0, "km": 15.1},
-    {"id": "1024", "name": "EEH - Amar Mahal Junction", "corridor": "EEH", "lat": 19.0680, "lng": 72.8960, "v_free": 65.0, "km": 16.0},
-    {"id": "1025", "name": "EEH - Chembur Priyadarshini", "corridor": "EEH", "lat": 19.0580, "lng": 72.8880, "v_free": 75.0, "km": 17.4},
-    {"id": "1026", "name": "EEH - Kurla Signal EEH", "corridor": "EEH", "lat": 19.0510, "lng": 72.8810, "v_free": 70.0, "km": 18.5},
-    {"id": "1027", "name": "EEH - Everard Nagar", "corridor": "EEH", "lat": 19.0450, "lng": 72.8750, "v_free": 75.0, "km": 19.4},
-    {"id": "1028", "name": "EEH - Chunabhatti Flyover", "corridor": "EEH", "lat": 19.0400, "lng": 72.8680, "v_free": 75.0, "km": 20.3},
-    {"id": "1029", "name": "EEH - Sion Circle North", "corridor": "EEH", "lat": 19.0360, "lng": 72.8620, "v_free": 70.0, "km": 21.2},
-    {"id": "1030", "name": "EEH - GTB Nagar Approach", "corridor": "EEH", "lat": 19.0310, "lng": 72.8590, "v_free": 70.0, "km": 22.0},
+    # --- Eastern Express Highway (EEH: Thane -> Sion, 14 Checkpoints) ---
+    {"id": "1017", "name": "EEH - Anand Nagar Toll Thane", "corridor": "EEH", "lat": 19.19843, "lng": 72.96932, "v_free": 80.0, "km": 0.0},
+    {"id": "1018", "name": "EEH - Mulund Check Naka", "corridor": "EEH", "lat": 19.18895, "lng": 72.96462, "v_free": 80.0, "km": 1.7},
+    {"id": "1019", "name": "EEH - Mulund Airoli Jn", "corridor": "EEH", "lat": 19.17408, "lng": 72.96864, "v_free": 80.0, "km": 3.6},
+    {"id": "1020", "name": "EEH - Nahur Flyover", "corridor": "EEH", "lat": 19.16006, "lng": 72.96071, "v_free": 80.0, "km": 5.4},
+    {"id": "1021", "name": "EEH - Bhandup Sonapur", "corridor": "EEH", "lat": 19.14990, "lng": 72.95387, "v_free": 80.0, "km": 6.9},
+    {"id": "1022", "name": "EEH - Kanjurmarg Flyover", "corridor": "EEH", "lat": 19.13619, "lng": 72.94548, "v_free": 80.0, "km": 8.8},
+    {"id": "1023", "name": "EEH - Vikhroli JVLR Jn", "corridor": "EEH", "lat": 19.12073, "lng": 72.93730, "v_free": 75.0, "km": 10.9},
+    {"id": "1024", "name": "EEH - Vikhroli Godrej Colony", "corridor": "EEH", "lat": 19.10485, "lng": 72.93074, "v_free": 75.0, "km": 12.9},
+    {"id": "1025", "name": "EEH - Ghatkopar Pantnagar", "corridor": "EEH", "lat": 19.08989, "lng": 72.92463, "v_free": 75.0, "km": 14.8},
+    {"id": "1026", "name": "EEH - Ghatkopar Ramabai Nagar", "corridor": "EEH", "lat": 19.07956, "lng": 72.91715, "v_free": 70.0, "km": 16.3},
+    {"id": "1027", "name": "EEH - Chheda Nagar Bottleneck", "corridor": "EEH", "lat": 19.06711, "lng": 72.90188, "v_free": 65.0, "km": 18.3},
+    {"id": "1028", "name": "EEH - Amar Mahal Junction", "corridor": "EEH", "lat": 19.05887, "lng": 72.89014, "v_free": 65.0, "km": 19.8},
+    {"id": "1029", "name": "EEH - Chunabhatti Everard Nagar", "corridor": "EEH", "lat": 19.05064, "lng": 72.87485, "v_free": 70.0, "km": 21.6},
+    {"id": "1030", "name": "EEH - Sion Circle North", "corridor": "EEH", "lat": 19.04267, "lng": 72.86346, "v_free": 70.0, "km": 23.0},
 
-    # --- Bandra-Worli Sea Link & Coastal Road (BWSL) ---
-    {"id": "1031", "name": "BWSL - Bandra Toll Plaza", "corridor": "BWSL", "lat": 19.0410, "lng": 72.8220, "v_free": 85.0, "km": 0.0},
-    {"id": "1032", "name": "BWSL - Mid-Span Cable Stay", "corridor": "BWSL", "lat": 19.0270, "lng": 72.8160, "v_free": 90.0, "km": 2.2},
-    {"id": "1033", "name": "BWSL - Worli Sea Face South", "corridor": "BWSL", "lat": 19.0130, "lng": 72.8130, "v_free": 85.0, "km": 4.5},
-    {"id": "1034", "name": "Coastal Rd - Worli Interchange", "corridor": "BWSL", "lat": 19.0060, "lng": 72.8110, "v_free": 85.0, "km": 5.4},
-    {"id": "1035", "name": "Coastal Rd - Haji Ali Bridge", "corridor": "BWSL", "lat": 18.9830, "lng": 72.8090, "v_free": 85.0, "km": 8.0},
-    {"id": "1036", "name": "Coastal Rd - Priyadarshini Park", "corridor": "BWSL", "lat": 18.9610, "lng": 72.8040, "v_free": 85.0, "km": 10.5},
+    # --- South Western Arterial (Bandra West -> Marine Drive, 6 Checkpoints) ---
+    {"id": "1031", "name": "South - Bandra West Hill Rd", "corridor": "BWSL", "lat": 19.05506, "lng": 72.83482, "v_free": 60.0, "km": 0.0},
+    {"id": "1032", "name": "South - Mahim Western Arterial", "corridor": "BWSL", "lat": 19.02999, "lng": 72.84176, "v_free": 65.0, "km": 3.0},
+    {"id": "1033", "name": "South - Prabhadevi Worli Naka", "corridor": "BWSL", "lat": 19.00618, "lng": 72.84052, "v_free": 60.0, "km": 5.8},
+    {"id": "1034", "name": "South - Mahalaxmi Racecourse", "corridor": "BWSL", "lat": 18.97708, "lng": 72.83363, "v_free": 65.0, "km": 9.2},
+    {"id": "1035", "name": "South - Pedder Road Girgaon", "corridor": "BWSL", "lat": 18.94875, "lng": 72.82891, "v_free": 60.0, "km": 12.6},
+    {"id": "1036", "name": "South - Marine Drive Promenade", "corridor": "BWSL", "lat": 18.92715, "lng": 72.82598, "v_free": 70.0, "km": 15.2},
 
-    # --- Jogeshwari-Vikhroli Link Road (JVLR: West -> East) ---
-    {"id": "1037", "name": "JVLR - WEH Junction Start", "corridor": "JVLR", "lat": 19.1350, "lng": 72.8530, "v_free": 60.0, "km": 0.0},
-    {"id": "1038", "name": "JVLR - Majas Depot Jogeshwari", "corridor": "JVLR", "lat": 19.1330, "lng": 72.8670, "v_free": 60.0, "km": 1.5},
-    {"id": "1039", "name": "JVLR - SEEPZ Andheri East", "corridor": "JVLR", "lat": 19.1300, "lng": 72.8820, "v_free": 55.0, "km": 3.1},
-    {"id": "1040", "name": "JVLR - Powai Lake Promenade", "corridor": "JVLR", "lat": 19.1260, "lng": 72.8990, "v_free": 55.0, "km": 4.9},
-    {"id": "1041", "name": "JVLR - IIT Bombay Main Gate", "corridor": "JVLR", "lat": 19.1240, "lng": 72.9130, "v_free": 60.0, "km": 6.4},
-    {"id": "1042", "name": "JVLR - Gandhi Nagar Flyover", "corridor": "JVLR", "lat": 19.1200, "lng": 72.9230, "v_free": 60.0, "km": 7.6},
-    {"id": "1043", "name": "JVLR - EEH Junction End", "corridor": "JVLR", "lat": 19.1160, "lng": 72.9270, "v_free": 60.0, "km": 8.5},
+    # --- Jogeshwari-Vikhroli Link Road (JVLR: West -> East, 7 Checkpoints) ---
+    {"id": "1037", "name": "JVLR - WEH Junction Start", "corridor": "JVLR", "lat": 19.13900, "lng": 72.85504, "v_free": 60.0, "km": 0.0},
+    {"id": "1038", "name": "JVLR - Majas Depot Jogeshwari", "corridor": "JVLR", "lat": 19.13974, "lng": 72.86681, "v_free": 60.0, "km": 1.4},
+    {"id": "1039", "name": "JVLR - SEEPZ Andheri East", "corridor": "JVLR", "lat": 19.12996, "lng": 72.87792, "v_free": 55.0, "km": 3.0},
+    {"id": "1040", "name": "JVLR - Powai Lake Promenade", "corridor": "JVLR", "lat": 19.12462, "lng": 72.89608, "v_free": 55.0, "km": 5.0},
+    {"id": "1041", "name": "JVLR - IIT Bombay Main Gate", "corridor": "JVLR", "lat": 19.12404, "lng": 72.90969, "v_free": 60.0, "km": 6.5},
+    {"id": "1042", "name": "JVLR - Gandhi Nagar Flyover", "corridor": "JVLR", "lat": 19.12569, "lng": 72.92280, "v_free": 60.0, "km": 7.9},
+    {"id": "1043", "name": "JVLR - EEH Junction End", "corridor": "JVLR", "lat": 19.12073, "lng": 72.93730, "v_free": 60.0, "km": 9.5},
 
-    # --- Santacruz-Chembur Link Road (SCLR: West -> East) ---
-    {"id": "1044", "name": "SCLR - WEH Milan Start", "corridor": "SCLR", "lat": 19.0830, "lng": 72.8480, "v_free": 55.0, "km": 0.0},
-    {"id": "1045", "name": "SCLR - Vakola Junction", "corridor": "SCLR", "lat": 19.0790, "lng": 72.8580, "v_free": 50.0, "km": 1.1},
-    {"id": "1046", "name": "SCLR - BKC North Gate", "corridor": "SCLR", "lat": 19.0740, "lng": 72.8690, "v_free": 50.0, "km": 2.3},
-    {"id": "1047", "name": "SCLR - Kurla Double Decker", "corridor": "SCLR", "lat": 19.0680, "lng": 72.8790, "v_free": 50.0, "km": 3.6},
-    {"id": "1048", "name": "SCLR - Nehru Nagar Kurla", "corridor": "SCLR", "lat": 19.0640, "lng": 72.8890, "v_free": 55.0, "km": 4.8},
-    {"id": "1049", "name": "SCLR - Tilak Nagar ROB", "corridor": "SCLR", "lat": 19.0670, "lng": 72.8950, "v_free": 55.0, "km": 5.6},
-    {"id": "1050", "name": "SCLR - Chedda Nagar EEH End", "corridor": "SCLR", "lat": 19.0720, "lng": 72.9010, "v_free": 55.0, "km": 6.5},
+    # --- Santacruz-Chembur Link Road (SCLR: West -> East, 7 Checkpoints) ---
+    {"id": "1044", "name": "SCLR - WEH Milan / Vakola Start", "corridor": "SCLR", "lat": 19.08376, "lng": 72.84644, "v_free": 55.0, "km": 0.0},
+    {"id": "1045", "name": "SCLR - Vakola Junction East", "corridor": "SCLR", "lat": 19.07398, "lng": 72.85204, "v_free": 50.0, "km": 1.3},
+    {"id": "1046", "name": "SCLR - BKC Connector Jn", "corridor": "SCLR", "lat": 19.07130, "lng": 72.86350, "v_free": 50.0, "km": 2.6},
+    {"id": "1047", "name": "SCLR - Kurla Double Decker", "corridor": "SCLR", "lat": 19.07635, "lng": 72.87691, "v_free": 50.0, "km": 4.1},
+    {"id": "1048", "name": "SCLR - Nehru Nagar Kurla", "corridor": "SCLR", "lat": 19.06857, "lng": 72.88793, "v_free": 55.0, "km": 5.4},
+    {"id": "1049", "name": "SCLR - Tilak Nagar ROB", "corridor": "SCLR", "lat": 19.06656, "lng": 72.90058, "v_free": 55.0, "km": 6.8},
+    {"id": "1050", "name": "SCLR - Chheda Nagar EEH End", "corridor": "SCLR", "lat": 19.06713, "lng": 72.90192, "v_free": 55.0, "km": 7.1},
 ]
 
 N_SENSORS = len(SENSORS)
@@ -105,7 +105,7 @@ def build_adjacency_matrix(sensors, sigma=3.2, kappa=6.5):
     """
     Constructs weighted directed adjacency matrix.
     Physical connections are established along corridors (predecessor <-> successor)
-    and at major corridor interchange junctions (JVLR<->WEH/EEH, SCLR<->WEH/EEH, BWSL<->WEH).
+    and at major corridor interchange junctions (JVLR<->WEH/EEH, SCLR<->WEH/EEH, South<->WEH).
     """
     N = len(sensors)
     dist_mx = np.full((N, N), np.inf, dtype=np.float32)
@@ -120,35 +120,35 @@ def build_adjacency_matrix(sensors, sigma=3.2, kappa=6.5):
             dist_mx[i + 1, i] = d
 
     # Cross-corridor interchanges
-    # 1. JVLR Start (1037) <-> WEH Jogeshwari (1007)
-    i_jvlr_start, i_weh_j = SENSOR_ID_TO_IND["1037"], SENSOR_ID_TO_IND["1007"]
+    # 1. JVLR Start (1037) <-> WEH Jogeshwari (1009)
+    i_jvlr_start, i_weh_j = SENSOR_ID_TO_IND["1037"], SENSOR_ID_TO_IND["1009"]
     d1 = haversine_distance_km(sensors[i_jvlr_start]["lat"], sensors[i_jvlr_start]["lng"],
                                sensors[i_weh_j]["lat"], sensors[i_weh_j]["lng"])
     dist_mx[i_jvlr_start, i_weh_j] = dist_mx[i_weh_j, i_jvlr_start] = max(d1, 0.5)
 
-    # 2. JVLR End (1043) <-> EEH Vikhroli (1021)
-    i_jvlr_end, i_eeh_v = SENSOR_ID_TO_IND["1043"], SENSOR_ID_TO_IND["1021"]
+    # 2. JVLR End (1043) <-> EEH Vikhroli (1023)
+    i_jvlr_end, i_eeh_v = SENSOR_ID_TO_IND["1043"], SENSOR_ID_TO_IND["1023"]
     d2 = haversine_distance_km(sensors[i_jvlr_end]["lat"], sensors[i_jvlr_end]["lng"],
                                sensors[i_eeh_v]["lat"], sensors[i_eeh_v]["lng"])
     dist_mx[i_jvlr_end, i_eeh_v] = dist_mx[i_eeh_v, i_jvlr_end] = max(d2, 0.5)
 
-    # 3. SCLR Start (1044) <-> WEH Milan (1010)
-    i_sclr_start, i_weh_m = SENSOR_ID_TO_IND["1044"], SENSOR_ID_TO_IND["1010"]
+    # 3. SCLR Start (1044) <-> WEH Vakola (1013)
+    i_sclr_start, i_weh_m = SENSOR_ID_TO_IND["1044"], SENSOR_ID_TO_IND["1013"]
     d3 = haversine_distance_km(sensors[i_sclr_start]["lat"], sensors[i_sclr_start]["lng"],
                                sensors[i_weh_m]["lat"], sensors[i_weh_m]["lng"])
     dist_mx[i_sclr_start, i_weh_m] = dist_mx[i_weh_m, i_sclr_start] = max(d3, 0.5)
 
-    # 4. SCLR End (1050) <-> EEH Chedda Nagar (1023) / Amar Mahal (1024)
-    i_sclr_end, i_eeh_c = SENSOR_ID_TO_IND["1050"], SENSOR_ID_TO_IND["1023"]
+    # 4. SCLR End (1050) <-> EEH Chheda Nagar (1027) / Amar Mahal (1028)
+    i_sclr_end, i_eeh_c = SENSOR_ID_TO_IND["1050"], SENSOR_ID_TO_IND["1027"]
     d4 = haversine_distance_km(sensors[i_sclr_end]["lat"], sensors[i_sclr_end]["lng"],
                                sensors[i_eeh_c]["lat"], sensors[i_eeh_c]["lng"])
     dist_mx[i_sclr_end, i_eeh_c] = dist_mx[i_eeh_c, i_sclr_end] = max(d4, 0.5)
 
-    # 5. BWSL Start (1031) <-> WEH Mahim / Bandra (1015, 1016)
-    i_bwsl_start, i_weh_b = SENSOR_ID_TO_IND["1031"], SENSOR_ID_TO_IND["1015"]
-    d5 = haversine_distance_km(sensors[i_bwsl_start]["lat"], sensors[i_bwsl_start]["lng"],
+    # 5. South Arterial Start (1031) <-> WEH Bandra Kalanagar (1015)
+    i_south_start, i_weh_b = SENSOR_ID_TO_IND["1031"], SENSOR_ID_TO_IND["1015"]
+    d5 = haversine_distance_km(sensors[i_south_start]["lat"], sensors[i_south_start]["lng"],
                                sensors[i_weh_b]["lat"], sensors[i_weh_b]["lng"])
-    dist_mx[i_bwsl_start, i_weh_b] = dist_mx[i_weh_b, i_bwsl_start] = max(d5, 1.2)
+    dist_mx[i_south_start, i_weh_b] = dist_mx[i_weh_b, i_south_start] = max(d5, 0.8)
 
     # All-pairs shortest paths via Floyd-Warshall
     sp_dist = dist_mx.copy()
@@ -187,11 +187,11 @@ def generate_mumbai_speeds(n_timesteps=34272, start_date="2019-01-01"):
 
     speeds = np.zeros((n_timesteps, N_SENSORS), dtype=np.float32)
 
-    # Bottleneck multiplier per sensor (Kalanagar 1013, Chedda Nagar 1023, JVLR 1039, etc.)
+    # Bottleneck multiplier per sensor (Kalanagar 1015, Chheda Nagar 1027, JVLR 1039, etc.)
     bottleneck_severity = np.ones(N_SENSORS)
-    bottleneck_severity[SENSOR_ID_TO_IND["1013"]] = 1.45  # Kalanagar
-    bottleneck_severity[SENSOR_ID_TO_IND["1023"]] = 1.40  # Chedda Nagar
-    bottleneck_severity[SENSOR_ID_TO_IND["1007"]] = 1.30  # Jogeshwari JVLR
+    bottleneck_severity[SENSOR_ID_TO_IND["1015"]] = 1.45  # Kalanagar
+    bottleneck_severity[SENSOR_ID_TO_IND["1027"]] = 1.40  # Chheda Nagar
+    bottleneck_severity[SENSOR_ID_TO_IND["1009"]] = 1.30  # Jogeshwari JVLR
     bottleneck_severity[SENSOR_ID_TO_IND["1039"]] = 1.35  # SEEPZ JVLR
     bottleneck_severity[SENSOR_ID_TO_IND["1047"]] = 1.35  # Kurla Double Decker SCLR
 
