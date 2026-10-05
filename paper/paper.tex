@@ -1,0 +1,180 @@
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage[title]{appendix}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{manyfoot}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{listings}
+
+\theoremstyle{thmstyleone}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{thmstyletwo}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+
+\theoremstyle{thmstylethree}
+\newtheorem{definition}{Definition}
+
+\raggedbottom
+
+\begin{document}
+
+\title[From Metres to Minutes: Travel-Time-Based Graph Construction for ST-GCN]{From Metres to Minutes: Travel-Time-Based Graph Construction for Spatio-Temporal Graph Convolutional Traffic Forecasting}
+
+\author[1]{\fnm{Omkar} \sur{Desai}}\email{omkar.desai@somaiya.edu}
+% Roll No: 16010123220
+
+\author[1]{\fnm{Siddhant} \sur{Thakur}}\email{siddhant.thakur@somaiya.edu}
+% Roll No: 16010123332
+
+\author[1]{\fnm{Soham} \sur{Shukla}}\email{soham.shukla@somaiya.edu}
+% Roll No: 16010123334
+
+\author*[1]{\fnm{Yuvraj} \sur{Pandey}}\email{yuvraj.pandey@somaiya.edu}
+% Roll No: 16010123339
+
+\author[1]{\fnm{Prof. Sheetal} \sur{Pereira}}\email{sheetal.pereira@somaiya.edu}
+% Project Guide
+
+\affil[1]{\orgdiv{Department of Computer Engineering}, \orgname{K. J. Somaiya College of Engineering}, \orgaddress{\city{Mumbai}, \state{Maharashtra}, \country{India}}}
+
+\abstract{Spatio-temporal graph neural networks have emerged as the standard paradigm for urban traffic forecasting, combining temporal convolutions with spatial graph convolutions. While physical distance-based Gaussian kernels are universally adopted to parameterize spatial graph adjacency, their underlying assumption that road distance directly reflects spatial coupling is fundamentally flawed across heterogeneous speed networks. In this work, we demonstrate that spatial interaction in road networks is governed by dynamic propagation latency rather than Euclidean or network distance in metres. Specifically, we propose a travel-time-based graph construction method for Spatio-Temporal Graph Convolutional Networks (ST-GCN) that replaces static physical distances with empirical free-flow travel times estimated directly from training velocity distributions. By translating the spatial Gaussian kernel from metres to minutes, the spatial coupling radius naturally aligns with the model's discrete temporal step size without adding model parameters or external data requirements. We evaluate the proposed formulation against standard distance-based graphs on the METR-LA benchmark under strict edge-sparsity and bandwidth controls. Our preliminary analytical formulations indicate that distance-based kernels systematically over-connect slow arterial corridors while under-connecting high-speed freeways, leading to spatial diffusion distortions. More broadly, this work highlights the necessity of dimensionally consistent spatio-temporal representations for graph-based urban computing.}
+
+\keywords{Spatio-Temporal Graph Neural Networks, Traffic Forecasting, Graph Construction, Travel-Time Adjacency, ST-GCN, Urban Computing}
+
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+
+Accurate short-term traffic forecasting is a cornerstone of modern Intelligent Transportation Systems (ITS), enabling proactive congestion mitigation, dynamic routing, and automated urban infrastructure control. Traffic states exhibit complex spatio-temporal dependencies: temporal trends reflect cyclic diurnal commuting behaviors, while spatial dependencies emerge from the continuous propagation of traffic waves across physical road networks.
+
+Recent deep learning frameworks, prominently Spatio-Temporal Graph Convolutional Networks (ST-GCN) \cite{yu2018spatio}, model these coupled dynamics by interweaving temporal convolutions (e.g., Gated Linear Units) with spatial spectral graph convolutions parameterized by Chebyshev polynomials. In standard formulations, the underlying sensor graph $G = (V, E, W)$ is constructed by embedding physical inter-sensor road distances $d_{ij}$ into a thresholded Gaussian kernel:
+\begin{equation}
+W_{ij} = \exp\left(-\frac{d_{ij}^2}{\theta^2}\right) \quad \text{if } i \neq j \text{ and } \exp\left(-\frac{d_{ij}^2}{\theta^2}\right) \ge \varepsilon, \quad \text{else } 0
+\label{eq:vanilla_adj}
+\end{equation}
+where $\theta$ is the standard deviation of road distances and $\varepsilon$ is a sparsity threshold.
+
+However, physical distance in metres is a physically inconsistent proxy for spatial interaction. A traffic perturbation travels along a roadway at a finite speed determined by the road classification, geometry, and free-flow speed. For example, a 3~km separation on a 65~mph freeway corresponds to an information propagation latency of approximately 1.7 minutes, highly relevant to a 5-minute forecasting horizon. Conversely, the same 3~km separation on a 25~mph signalized arterial represents a travel time of over 7 minutes, which lies beyond the immediate receptive field of a single 5-minute step. Consequently, distance-based kernels systematically over-connect low-speed segments and under-connect high-speed freeways.
+
+In this paper, we address this fundamental mismatch by proposing a **Free-Flow Travel-Time Adjacency** formulation. We preserve the exact ST-GCN architecture, Laplacian normalization, and training pipeline, modifying only the graph kernel to measure separation in temporal units (minutes) rather than spatial units (metres).
+
+The key contributions of this work are summarized as follows:
+\begin{enumerate}
+    \item We introduce a travel-time-based graph construction mechanism for ST-GCN that parameterizes spatial edge weights via robust empirical free-flow velocities, requiring zero external metadata.
+    \item We demonstrate that measuring spatial separation in propagation minutes harmonizes the spatial and temporal axes into mutually compatible dimensional units.
+    \item We present a controlled experimental framework on the METR-LA benchmark, featuring rigorous edge-count controls and speed-stratified ablation analyses to evaluate the precise source of predictive gains.
+\end{enumerate}
+
+\section{Related Work}\label{sec:related}
+
+\subsection{Spatio-Temporal Traffic Forecasting}
+Early traffic prediction literature relied on classical statistical time-series methods such as Historical Averages (HA) and Autoregressive Integrated Moving Average (ARIMA). The emergence of deep learning introduced recurrent architectures (LSTM, GRU), which were subsequently enhanced by Graph Neural Networks (GNNs) to capture non-Euclidean road topology. Notable models include DCRNN \cite{li2018diffusion}, which integrates diffusion convolutions with sequence-to-sequence recurrent cells, and Graph WaveNet \cite{wu2019graph}, which combines dilated 1D temporal convolutions with adaptive adjacency matrices.
+
+\subsection{Graph Construction Paradigms}
+Despite advances in temporal convolution mechanisms, the spatial graph construction in mainstream models remains predominantly reliant on static geographical distances \cite{yu2018spatio}. While some recent models explore learnable or dynamic graph matrices, they introduce substantial parameter overhead and lack explicit physical interpretability. Our approach directly enhances the physical fidelity of the pre-defined graph without altering model complexity.
+
+\section{Methodology}\label{sec:method}
+
+\subsection{Problem Formulation}
+Let $N$ denote the number of traffic sensors deployed across the urban network. At each discrete time step $t$, the network traffic state is represented as a feature matrix $X_t \in \mathbb{R}^{N \times C}$, where $C = 1$ denotes the observed average traffic speed. Given historical observations over $T_{\text{in}} = 12$ time steps (1 hour of 5-minute intervals), the objective is to predict future traffic speeds over $T_{\text{out}} = 12$ steps:
+\begin{equation}
+[X_{t-T_{\text{in}}+1}, \dots, X_t] \xrightarrow{\mathcal{F}(\cdot; \Theta)} [\hat{X}_{t+1}, \dots, \hat{X}_{t+T_{\text{out}}}]
+\end{equation}
+
+\subsection{Baseline ST-GCN Architecture}
+The ST-GCN model processes traffic sequences through stacked Spatio-Temporal Convolutional (ST-Conv) blocks. Each block employs a "sandwich" architecture:
+\begin{equation}
+\text{Gated Temporal Conv (GLU)} \longrightarrow \text{Spatial Graph Conv (Chebyshev)} \longrightarrow \text{Gated Temporal Conv (GLU)}
+\end{equation}
+Spatial graph convolution is defined over the normalized graph Laplacian $\tilde{L} = \frac{2}{\lambda_{\max}} L - I_N$, where $L = I_N - D^{-1/2} W D^{-1/2}$, using truncated Chebyshev polynomials up to order $K$:
+\begin{equation}
+\Theta *_G x = \sum_{k=0}^{K-1} \theta_k T_k(\tilde{L}) x
+\end{equation}
+with recurrence relation $T_0(\tilde{L}) = I_N$, $T_1(\tilde{L}) = \tilde{L}$, and $T_k(\tilde{L}) = 2\tilde{L}T_{k-1}(\tilde{L}) - T_{k-2}(\tilde{L})$.
+
+\subsection{Proposed Travel-Time Graph Construction}
+Instead of physical road network distances $d_{ij}$, we compute the free-flow travel time $\tau_{ij}$ between connected sensor pairs $(i, j)$.
+
+\textbf{Step 1: Empirical Free-Flow Velocity Estimation.}
+For each sensor $i \in V$, we estimate the free-flow velocity $v_i$ using the 95th percentile of observed speeds across the training split:
+\begin{equation}
+v_i = \text{Quantile}_{0.95}\left\{ x_i(t) : t \in \mathcal{D}_{\text{train}} \right\}
+\end{equation}
+
+\textbf{Step 2: Edge Velocity and Travel Time.}
+The pairwise edge velocity $v_{ij}$ is computed via the arithmetic mean (or alternatively harmonic mean):
+\begin{equation}
+v_{ij} = \frac{v_i + v_j}{2}, \quad \tau_{ij} = \frac{d_{ij}}{v_{ij}}
+\end{equation}
+
+\textbf{Step 3: Travel-Time Gaussian Kernel.}
+The proposed travel-time weighted adjacency matrix $W^{\text{tt}}$ is formulated as:
+\begin{equation}
+W^{\text{tt}}_{ij} = \exp\left( -\frac{\tau_{ij}^2}{\theta_t^2} \right) \quad \text{if } i \neq j \text{ and } \exp\left( -\frac{\tau_{ij}^2}{\theta_t^2} \right) \ge \varepsilon, \quad \text{else } 0
+\label{eq:tt_adj}
+\end{equation}
+where $\theta_t$ is dynamically set to the standard deviation of non-zero travel times $\tau_{ij}$, ensuring parity with the standard distance kernel bandwidth heuristic.
+
+\section{Experimental Design \& Protocol}\label{sec:experiments}
+
+\subsection{Dataset and Preprocessing}
+We evaluate the framework on the benchmark **METR-LA** dataset, comprising 207 loop detector sensors on Los Angeles freeways over 4 months of 5-minute interval speed readings (34,272 time steps). We follow standard chronological splitting: 70\% training, 10\% validation, and 20\% testing. Features are standardized via global z-score normalization based on training statistics.
+
+\subsection{Baseline Models}
+The proposed formulation is evaluated against:
+\begin{itemize}
+    \item \textbf{Historical Average (HA)}: Historical speed profiles grouped by time-of-day and day-of-week.
+    \item \textbf{ARIMA / Seasonal Naive}: Per-sensor classical temporal autoregression.
+    \item \textbf{Vanilla ST-GCN (Distance Graph)}: Standard ST-GCN utilizing distance-based adjacency $W$ (Eq.~\ref{eq:vanilla_adj}).
+    \item \textbf{Graph WaveNet / DCRNN}: Reference published benchmarks for contextual comparison.
+\end{itemize}
+
+\subsection{Planned Experimental Suite}
+To rigorously validate that performance gains originate from travel-time modeling rather than graph density artifacts, we define the following experimental suite:
+\begin{enumerate}
+    \item \textbf{E1 (Main Forecasting Performance)}: Masked MAE, RMSE, and MAPE across 15, 30, and 60-minute horizons averaged over 5 independent random seeds.
+    \item \textbf{E2 (Edge Sparsity Control)}: Calibrate threshold $\varepsilon$ to enforce identical non-zero edge counts between $W$ and $W^{\text{tt}}$, eliminating density bias.
+    \item \textbf{E3 (Speed Stratification Analysis)}: Partition sensors into low-speed (arterial) and high-speed (freeway) cohorts to empirically verify that low-speed nodes benefit most from corrected travel-time connectivity.
+    \item \textbf{E4 (Velocity Estimation Ablation)}: Sensitivity evaluation comparing 95th percentile vs 85th percentile vs night-time (00:00--05:00) free-flow proxies, as well as arithmetic vs harmonic velocity averaging.
+\end{enumerate}
+
+\section{Conclusion \& Future Work}\label{sec:conclusion}
+
+In this paper, we presented a travel-time-based graph construction methodology for Spatio-Temporal Graph Convolutional Networks. By converting spatial proximity from static physical metres to dynamic propagation minutes, the proposed approach harmonizes the spatial diffusion radius with discrete time steps without introducing model parameters. Future extensions will incorporate real-time dynamic travel times and cross-domain validation on emerging developing-world urban networks.
+
+\backmatter
+
+\bmhead{Acknowledgements}
+The authors express their sincere gratitude to Prof. Sheetal Pereira for continuous guidance and valuable mentorship throughout this research.
+
+\section*{Declarations}
+\begin{itemize}
+\item \textbf{Funding}: Not applicable.
+\item \textbf{Conflict of interest}: The authors declare no competing interests.
+\item \textbf{Code availability}: All implementation scripts and model checkpoints will be made publicly available upon completion of benchmarking.
+\end{itemize}
+
+\begin{thebibliography}{99}
+\bibitem{yu2018spatio}
+Yu, B., Yin, H., Zhu, Z.: Spatio-temporal graph convolutional networks: A deep learning framework for traffic forecasting. In: Proceedings of the 27th International Joint Conference on Artificial Intelligence (IJCAI), pp. 3634--3640 (2018)
+
+\bibitem{li2018diffusion}
+Li, Y., Yu, R., Shahabi, C., Liu, Y.: Diffusion convolutional recurrent neural network: Data-driven traffic forecasting. In: International Conference on Learning Representations (ICLR) (2018)
+
+\bibitem{wu2019graph}
+Wu, Z., Pan, S., Long, G., Jiang, J., Zhang, C.: Graph WaveNet for deep spatial-temporal graph modeling. In: Proceedings of the 28th International Joint Conference on Artificial Intelligence (IJCAI), pp. 1907--1914 (2019)
+\end{thebibliography}
+
+\end{document}
