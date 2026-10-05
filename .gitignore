@@ -96,4 +96,9 @@ info.md
 
 /data/raw/*
 !/data/raw/weather_CA_2019.csv
+!/data/raw/adj_MUMBAI-50.pkl
+!/data/raw/MUMBAI-50.h5
+!/data/raw/weather_MUMBAI_2019.csv
 data/security.db
+# TypeScript incremental compilation cache
+*.tsbuildinfo
