@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
+import { useCity } from "@/lib/city-context";
 import { 
   LayoutDashboard, 
   LineChart, 
@@ -11,7 +12,8 @@ import {
   Activity, 
   Route, 
   Video,
-  Settings
+  Settings,
+  Globe
 } from "lucide-react";
 
 const links = [
@@ -26,16 +28,54 @@ const links = [
 export function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { city, setCity, cityConfig } = useCity();
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-56 border-r border-border bg-background flex flex-col justify-between">
       <div>
-        <div className="p-5 border-b border-border">
-          <h1 className="text-sm font-semibold tracking-wide text-foreground">
-            UrbanPulse
-          </h1>
-          <p className="text-[11px] text-muted-foreground mt-0.5">METR-LA · 207 sensors</p>
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center justify-between">
+            <h1 className="text-sm font-semibold tracking-wide text-foreground flex items-center gap-1.5">
+              <Globe className="h-4 w-4 text-primary" />
+              UrbanPulse
+            </h1>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+              {cityConfig.sensorCount} nodes
+            </span>
+          </div>
+
+          {/* Segmented City Switcher */}
+          <div className="mt-3 grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 border border-border">
+            <button
+              type="button"
+              onClick={() => setCity("la")}
+              className={cn(
+                "flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all",
+                city === "la"
+                  ? "bg-background text-foreground shadow-sm font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <span>🇺🇸 LA</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setCity("mumbai")}
+              className={cn(
+                "flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all",
+                city === "mumbai"
+                  ? "bg-background text-foreground shadow-sm font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <span>🇮🇳 Mumbai</span>
+            </button>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1.5 truncate">
+            {cityConfig.subtitle}
+          </p>
         </div>
+
         <nav className="p-3 space-y-0.5">
           {links.map(({ href, label, icon: Icon }) => (
             <Link

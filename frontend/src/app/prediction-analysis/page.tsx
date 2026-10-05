@@ -32,7 +32,10 @@ interface TimeSeriesData {
   steps: number;
 }
 
+import { useCity } from "@/lib/city-context";
+
 export default function PredictionAnalysisPage() {
+  const { cityConfig } = useCity();
   const [data, setData] = useState<DashboardData | null>(null);
   const [selectedSensor, setSelectedSensor] = useState("");
   const [heatmapData, setHeatmapData] = useState<HeatmapData | null>(null);
@@ -40,26 +43,30 @@ export default function PredictionAnalysisPage() {
   const [sensorInput, setSensorInput] = useState("");
 
   useEffect(() => {
-    fetch("/dashboard-data.json").then((r) => r.json()).then((d) => {
-      setData(d);
-      const keys = Object.keys(d.timeseries);
-      if (keys.length) setSelectedSensor(keys[0]);
-    });
-  }, []);
+    fetch(cityConfig.files.dashboardData)
+      .then((r) => r.json())
+      .then((d) => {
+        setData(d);
+        const keys = Object.keys(d.timeseries);
+        if (keys.length) setSelectedSensor(keys[0]);
+      });
 
-  useEffect(() => {
-    fetch("/heatmap-data.json").then((r) => r.json()).then(setHeatmapData).catch(() => null);
-  }, []);
+    fetch(cityConfig.files.heatmapData)
+      .then((r) => r.json())
+      .then(setHeatmapData)
+      .catch(() => null);
 
-  useEffect(() => {
-    fetch("/timeseries-data.json").then((r) => r.json()).then(setTimeSeriesData).catch(() => null);
-  }, []);
+    fetch(cityConfig.files.timeseriesData)
+      .then((r) => r.json())
+      .then(setTimeSeriesData)
+      .catch(() => null);
+  }, [cityConfig]);
 
   const timeSeries = timeSeriesData?.series ?? data?.timeseries ?? {};
   const sensorIds = timeSeriesData?.sensor_ids ?? Object.keys(timeSeries);
   const raw = timeSeries[selectedSensor];
   const ts = raw ? raw.actual.slice(0, 200).map((a, i) => ({ t: i, actual: a, predicted: raw.predicted[i] })) : [];
-  const unitLabel = timeSeriesData?.unit ? ` (${timeSeriesData.unit})` : "";
+  const unitLabel = timeSeriesData?.unit ? ` (${timeSeriesData.unit})` : ` (${cityConfig.speedUnit})`;
 
   useEffect(() => {
     if (!sensorIds.length) return;
@@ -110,9 +117,14 @@ export default function PredictionAnalysisPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Prediction Analysis</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <span>Prediction Analysis</span>
+          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-primary/10 text-primary border border-primary/20">
+            {cityConfig.flag} {cityConfig.name}
+          </span>
+        </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Evaluation of model predictions against observed traffic measurements
+          Evaluation of model predictions against observed traffic measurements across {cityConfig.name}
         </p>
       </div>
 

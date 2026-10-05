@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCity } from "@/lib/city-context";
 
 const MiniMap = dynamic(() => import("@/components/mini-map"), { ssr: false });
 
@@ -47,6 +48,7 @@ interface Weather {
 /* ── page ──────────────────────────────────────────────────────────── */
 
 export default function CctvAnalyticsPage() {
+  const { cityConfig } = useCity();
   /* detection state */
   const [source, setSource] = useState<"video" | "camera">("video");
   const [videoPath, setVideoPath] = useState("assets/temp_video.mp4");
@@ -64,17 +66,22 @@ export default function CctvAnalyticsPage() {
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [weather, setWeather] = useState<Weather | null>(null);
 
-  /* load sensor locations + weather on mount */
+  /* load sensor locations + weather on mount / city change */
   useEffect(() => {
-    fetch("/sensor-locations.json")
+    fetch(cityConfig.files.sensorLocations)
       .then((r) => r.json())
-      .then((d: { sensors: Sensor[] }) => setSensors(d.sensors))
+      .then((d: { sensors: Sensor[] }) => {
+        setSensors(d.sensors || []);
+        if (d.sensors && d.sensors.length > 0 && sensorIdx >= d.sensors.length) {
+          setSensorIdx(0);
+        }
+      })
       .catch(() => {});
     fetch(`${API_BASE}/dashboard/context`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (d?.weather) setWeather(d.weather); })
       .catch(() => {});
-  }, []);
+  }, [cityConfig]);
 
   /* fetch sensor model context when sensorIdx changes */
   useEffect(() => {
@@ -202,9 +209,14 @@ export default function CctvAnalyticsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">CCTV Analytics</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <span>CCTV Analytics</span>
+          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-primary/10 text-primary border border-primary/20">
+            {cityConfig.flag} {cityConfig.name}
+          </span>
+        </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Real-time vehicle detection linked to the ST-GCN traffic prediction model
+          Real-time vehicle detection linked to the {cityConfig.name} ST-GCN traffic prediction model
         </p>
       </div>
 
@@ -245,9 +257,9 @@ export default function CctvAnalyticsPage() {
               <div className="flex items-center gap-1.5 ml-auto">
                 <span className="text-xs text-muted-foreground">Linked sensor</span>
                 <input
-                  type="number" min={1} max={207}
+                  type="number" min={1} max={cityConfig.sensorCount}
                   value={sensorIdx + 1}
-                  onChange={(e) => setSensorIdx(Math.min(206, Math.max(0, (Number(e.target.value) || 1) - 1)))}
+                  onChange={(e) => setSensorIdx(Math.min(cityConfig.sensorCount - 1, Math.max(0, (Number(e.target.value) || 1) - 1)))}
                   disabled={isRunning}
                   className="h-9 w-20 rounded-md border border-border bg-card text-foreground text-sm px-2 text-center disabled:opacity-50"
                 />

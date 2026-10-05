@@ -27,6 +27,7 @@ const CATEGORY_MAP: Record<string, string> = {
   "Air Temperature": "Weather",
   "Pressure (alt)": "Weather",
   "Wind Speed": "Weather",
+  "Precipitation Rate": "Weather",
   "Feature 11": "Other",
 };
 
@@ -37,12 +38,15 @@ const CATEGORY_COLORS: Record<string, string> = {
   Other: "#8b5cf6",
 };
 
+import { useCity } from "@/lib/city-context";
+
 export default function FeatureAttributionPage() {
+  const { cityConfig } = useCity();
   const [data, setData] = useState<DashboardData | null>(null);
 
   useEffect(() => {
-    fetch("/dashboard-data.json").then((r) => r.json()).then(setData);
-  }, []);
+    fetch(cityConfig.files.dashboardData).then((r) => r.json()).then(setData);
+  }, [cityConfig]);
 
   if (!data) return <div className="flex items-center justify-center h-96 text-muted-foreground">Loading...</div>;
 
@@ -73,11 +77,18 @@ export default function FeatureAttributionPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Feature Attribution</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Gradient-based importance analysis of input features on model predictions
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            <span>Feature Attribution</span>
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-primary/10 text-primary border border-primary/20">
+              {cityConfig.flag} {cityConfig.name}
+            </span>
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Gradient-based feature importance analysis for {cityConfig.name}
+          </p>
+        </div>
       </div>
 
       {/* Feature Importance Bar */}

@@ -7,9 +7,13 @@ import { C } from "@/lib/theme";
 
 const RoutePlannerMap = dynamic(() => import("@/components/route-planner-map"), { ssr: false });
 
+import { useCity } from "@/lib/city-context";
+
 interface Sensor {
   id: number;
   sensor_id?: string;
+  name?: string;
+  corridor?: string;
   lat: number;
   lng: number;
   avg_speed: number;
@@ -46,15 +50,88 @@ function haversineMiles(a: Sensor, b: Sensor): number {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
+function solveDijkstra(
+  startSensor: Sensor,
+  endSensor: Sensor,
+  sensorList: Sensor[],
+  edgeList: [number, number][],
+  type: "fastest" | "shortest"
+): string[] {
+  const startIdx = sensorList.findIndex((s) => s.id === startSensor.id || s.sensor_id === startSensor.sensor_id);
+  const endIdx = sensorList.findIndex((s) => s.id === endSensor.id || s.sensor_id === endSensor.sensor_id);
+  if (startIdx === -1 || endIdx === -1) return [];
+  if (startIdx === endIdx) return [sensorList[startIdx].sensor_id || String(sensorList[startIdx].id)];
+
+  const n = sensorList.length;
+  const adj: { to: number; cost: number }[][] = Array.from({ length: n }, () => []);
+
+  for (const [u, v] of edgeList) {
+    if (u < 0 || u >= n || v < 0 || v >= n) continue;
+    const su = sensorList[u];
+    const sv = sensorList[v];
+    const dist = haversineMiles(su, sv);
+    const cost = type === "fastest"
+      ? dist / Math.max((su.avg_speed + sv.avg_speed) / 2, 5)
+      : dist;
+    adj[u].push({ to: v, cost });
+    adj[v].push({ to: u, cost });
+  }
+
+  const dist = new Array(n).fill(Infinity);
+  const prev = new Array<number | null>(n).fill(null);
+  const visited = new Set<number>();
+  dist[startIdx] = 0;
+
+  for (let iter = 0; iter < n; iter++) {
+    let u = -1;
+    let minD = Infinity;
+    for (let i = 0; i < n; i++) {
+      if (!visited.has(i) && dist[i] < minD) {
+        minD = dist[i];
+        u = i;
+      }
+    }
+    if (u === -1 || minD === Infinity) break;
+    if (u === endIdx) break;
+    visited.add(u);
+
+    for (const edge of adj[u]) {
+      if (visited.has(edge.to)) continue;
+      const alt = dist[u] + edge.cost;
+      if (alt < dist[edge.to]) {
+        dist[edge.to] = alt;
+        prev[edge.to] = u;
+      }
+    }
+  }
+
+  if (prev[endIdx] === null) {
+    return [
+      sensorList[startIdx].sensor_id || String(sensorList[startIdx].id),
+      sensorList[endIdx].sensor_id || String(sensorList[endIdx].id),
+    ];
+  }
+
+  const path: string[] = [];
+  let curr: number | null = endIdx;
+  while (curr !== null) {
+    path.unshift(sensorList[curr].sensor_id || String(sensorList[curr].id));
+    curr = prev[curr];
+  }
+  return path;
+}
+
 export default function RoutePlannerPage() {
+  const { cityConfig } = useCity();
   const [sensors, setSensors] = useState<Sensor[]>([]);
+  const [edges, setEdges] = useState<[number, number][]>([]);
   const [start, setStart] = useState<Sensor | null>(null);
   const [end, setEnd] = useState<Sensor | null>(null);
   const [routeType, setRouteType] = useState<"fastest" | "shortest">("fastest");
   const [routeIds, setRouteIds] = useState<string[]>([]);
   const [routeLatLngs, setRouteLatLngs] = useState<[number, number][]>([]);
   const [etaMinutes, setEtaMinutes] = useState<number | null>(null);
-  const [distanceMiles, setDistanceMiles] = useState<number | null>(null);
+  const [distanceVal, setDistanceVal] = useState<number | null>(null);
   const [arrivalTime, setArrivalTime] = useState<string>("");
   const [arrivalDate, setArrivalDate] = useState<string>("");
   const [arrivalClock, setArrivalClock] = useState<string>("");
@@ -66,21 +143,43 @@ export default function RoutePlannerPage() {
   const [featureData, setFeatureData] = useState<DashboardData | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    fetch("/sensor-locations.json")
-      .then((r) => r.json())
-      .then((d: SensorData) => setSensors(d.sensors));
+  const resetRoute = useCallback(() => {
+    setStart(null);
+    setEnd(null);
+    setRouteIds([]);
+    setRouteLatLngs([]);
+    setEtaMinutes(null);
+    setDistanceVal(null);
+    setArrivalTime("");
+    setLeaveBy("");
+    setStatus("");
   }, []);
 
   useEffect(() => {
+    fetch(cityConfig.files.sensorLocations)
+      .then((r) => r.json())
+      .then((d: SensorData) => {
+        setSensors(d.sensors || []);
+        setEdges(d.edges || []);
+      })
+      .catch(() => {});
+
+    resetRoute();
+  }, [cityConfig, resetRoute]);
+
+  useEffect(() => {
     setMounted(true);
-    fetch("/dashboard-data.json").then((r) => r.json()).then(setFeatureData).catch(() => null);
-  }, []);
+    fetch(cityConfig.files.dashboardData)
+      .then((r) => r.json())
+      .then(setFeatureData)
+      .catch(() => null);
+  }, [cityConfig]);
 
   const sensorById = useMemo(() => {
     const map = new Map<string, Sensor>();
     sensors.forEach((s) => {
       if (s.sensor_id) map.set(s.sensor_id, s);
+      map.set(String(s.id), s);
     });
     return map;
   }, [sensors]);
@@ -125,11 +224,11 @@ export default function RoutePlannerPage() {
       setRouteIds([]);
       setRouteLatLngs([]);
       setEtaMinutes(null);
-      setDistanceMiles(null);
+      setDistanceVal(null);
       return;
     }
     if (!end) {
-      if (start.sensor_id === sensor.sensor_id) return;
+      if (start.sensor_id === sensor.sensor_id || start.id === sensor.id) return;
       setEnd(sensor);
       return;
     }
@@ -138,7 +237,7 @@ export default function RoutePlannerPage() {
     setRouteIds([]);
     setRouteLatLngs([]);
     setEtaMinutes(null);
-    setDistanceMiles(null);
+    setDistanceVal(null);
   }, [start, end]);
 
   const shapBars = useMemo(() => {
@@ -166,18 +265,6 @@ export default function RoutePlannerPage() {
     }));
   }, [featureData, arrivalTime]);
 
-  const resetRoute = () => {
-    setStart(null);
-    setEnd(null);
-    setRouteIds([]);
-    setRouteLatLngs([]);
-    setEtaMinutes(null);
-    setDistanceMiles(null);
-    setArrivalTime("");
-    setLeaveBy("");
-    setStatus("");
-  };
-
   const swapRoute = () => {
     if (!start || !end) return;
     setStart(end);
@@ -185,25 +272,40 @@ export default function RoutePlannerPage() {
     setRouteIds([]);
     setRouteLatLngs([]);
     setEtaMinutes(null);
-    setDistanceMiles(null);
+    setDistanceVal(null);
   };
 
   const planRoute = async () => {
-    if (!start?.sensor_id || !end?.sensor_id) {
-      setStatus("Select a start and end sensor on the map.");
+    if (!start || !end) {
+      setStatus("Select a start and destination sensor on the map.");
       return;
     }
     setLoading(true);
     setStatus("");
     try {
-      const routeRes = await fetch(`${API_BASE}/route`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ start_sensor_id: start.sensor_id, end_sensor_id: end.sensor_id }),
-      });
-      if (!routeRes.ok) throw new Error("Routing service unavailable");
-      const routeData: RouteResponse = await routeRes.json();
-      const selected = routeType === "fastest" ? routeData.fastest : routeData.shortest;
+      let selected: string[] = [];
+
+      // Try backend route first if available
+      try {
+        const routeRes = await fetch(`${API_BASE}/route`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            start_sensor_id: start.sensor_id || String(start.id),
+            end_sensor_id: end.sensor_id || String(end.id),
+          }),
+        });
+        if (routeRes.ok) {
+          const routeData: RouteResponse = await routeRes.json();
+          selected = routeType === "fastest" ? routeData.fastest : routeData.shortest;
+        }
+      } catch {
+        // Fallback to client-side graph Dijkstra
+      }
+
+      if (!selected.length) {
+        selected = solveDijkstra(start, end, sensors, edges, routeType);
+      }
 
       const sensorCoords: [number, number][] = selected
         .map((id) => sensorById.get(id))
@@ -212,7 +314,7 @@ export default function RoutePlannerPage() {
 
       setRouteIds(selected);
 
-      // Fetch real road geometry from OSRM (start & end only)
+      // Fetch real road geometry from OSRM
       try {
         const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
         const osrmRes = await fetch(osrmUrl);
@@ -220,26 +322,18 @@ export default function RoutePlannerPage() {
           const osrmData = await osrmRes.json();
           const coords: [number, number][] | undefined = osrmData?.routes?.[0]?.geometry?.coordinates;
           if (coords?.length) {
-            // GeoJSON is [lng, lat] → flip to [lat, lng]
             setRouteLatLngs(coords.map(([lng, lat]) => [lat, lng]));
           } else {
-            setRouteLatLngs(sensorCoords);
+            setRouteLatLngs(sensorCoords.length ? sensorCoords : [[start.lat, start.lng], [end.lat, end.lng]]);
           }
         } else {
-          setRouteLatLngs(sensorCoords);
+          setRouteLatLngs(sensorCoords.length ? sensorCoords : [[start.lat, start.lng], [end.lat, end.lng]]);
         }
       } catch {
-        setRouteLatLngs(sensorCoords);
+        setRouteLatLngs(sensorCoords.length ? sensorCoords : [[start.lat, start.lng], [end.lat, end.lng]]);
       }
 
-      const speedRes = await fetch(`${API_BASE}/predict`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      if (!speedRes.ok) throw new Error("Prediction service unavailable");
-      const speedMap = await speedRes.json();
-
+      // Compute ETA and Distance
       let totalMiles = 0;
       let totalHours = 0;
       for (let i = 0; i < selected.length - 1; i += 1) {
@@ -247,14 +341,23 @@ export default function RoutePlannerPage() {
         const to = sensorById.get(selected[i + 1]);
         if (!from || !to) continue;
         const segmentMiles = haversineMiles(from, to);
-        const speed = Math.max(Number(speedMap[selected[i]] ?? from.avg_speed ?? 30), 5);
+        const speed = Math.max(Number(from.avg_speed ?? 30), 5);
         totalMiles += segmentMiles;
         totalHours += segmentMiles / speed;
       }
 
+      if (totalHours === 0 && start && end) {
+        const directMiles = haversineMiles(start, end);
+        const speed = Math.max(Number(start.avg_speed ?? 30), 5);
+        totalMiles = directMiles;
+        totalHours = directMiles / speed;
+      }
+
       const minutes = Math.max(1, Math.round(totalHours * 60));
       setEtaMinutes(minutes);
-      setDistanceMiles(Number.isFinite(totalMiles) ? totalMiles : null);
+      const isKm = cityConfig.speedUnit === "km/h";
+      const finalDist = isKm ? totalMiles * 1.60934 : totalMiles;
+      setDistanceVal(Number.isFinite(finalDist) ? finalDist : null);
       if (!selected.length) setStatus("No route found between the selected sensors.");
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Failed to plan route");
@@ -266,9 +369,14 @@ export default function RoutePlannerPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Route Planner</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <span>Route Planner</span>
+          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-primary/10 text-primary border border-primary/20">
+            {cityConfig.flag} {cityConfig.name}
+          </span>
+        </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Click two sensors on the map to plan the fastest route with live traffic predictions
+          Select start and destination checkpoints in {cityConfig.name} to plan the fastest route with live traffic predictions
         </p>
       </div>
 
@@ -276,7 +384,7 @@ export default function RoutePlannerPage() {
         <div className="flex flex-col gap-4">
           <Card className="overflow-hidden">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Interactive LA Routing Map</CardTitle>
+              <CardTitle className="text-base">Interactive {cityConfig.name} Routing Map</CardTitle>
               <CardDescription>Click a sensor dot to set start, then end. Route animates along the selected path.</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -287,6 +395,7 @@ export default function RoutePlannerPage() {
                 routeLatLngs={routeLatLngs}
                 onSelectSensor={handleSelectSensor}
                 height="520px"
+                speedUnit={cityConfig.speedUnit}
               />
             </CardContent>
           </Card>
@@ -294,8 +403,8 @@ export default function RoutePlannerPage() {
           <div className="grid md:grid-cols-2 gap-4 flex-1">
             <Card className="flex flex-col">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">SHAP Drivers</CardTitle>
-                <CardDescription>Top contributors to the current prediction</CardDescription>
+                <CardTitle className="text-base">Attribution Drivers</CardTitle>
+                <CardDescription>Top factors contributing to route traffic predictions</CardDescription>
               </CardHeader>
               <CardContent className="flex-1 overflow-hidden flex flex-col">
                 <div className="flex-1 overflow-y-auto space-y-2 pr-1 shap-scroll">
@@ -327,10 +436,10 @@ export default function RoutePlannerPage() {
                 <CardDescription>Recommendations based on traffic predictions</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>1. Click a start sensor, then an end sensor.</p>
-                <p>2. Choose fastest or shortest route and plan.</p>
-                <p>3. Add an arrival time to see the recommended departure time.</p>
-                <p style={{ color: C.chart1 }}>Fastest routes adapt to predicted congestion in real time.</p>
+                <p>1. Click a start checkpoint, then a destination checkpoint.</p>
+                <p>2. Choose fastest (congestion-aware) or shortest path.</p>
+                <p>3. Set arrival time to calculate optimal leave-by recommendation.</p>
+                <p style={{ color: C.chart1 }}>Fastest routes adapt dynamically to arterial bottlenecks in {cityConfig.name}.</p>
               </CardContent>
             </Card>
           </div>
@@ -346,11 +455,15 @@ export default function RoutePlannerPage() {
               <div className="grid gap-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Start</span>
-                  <span className="text-foreground font-medium">{start ? `Sensor ${start.id}` : "Not set"}</span>
+                  <span className="text-foreground font-medium truncate max-w-[200px]" title={start?.name}>
+                    {start ? `Sensor ${start.id}${start.name ? ` (${start.name})` : ""}` : "Not set"}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">End</span>
-                  <span className="text-foreground font-medium">{end ? `Sensor ${end.id}` : "Not set"}</span>
+                  <span className="text-foreground font-medium truncate max-w-[200px]" title={end?.name}>
+                    {end ? `Sensor ${end.id}${end.name ? ` (${end.name})` : ""}` : "Not set"}
+                  </span>
                 </div>
               </div>
 
@@ -430,7 +543,10 @@ export default function RoutePlannerPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <SummaryRow label="ETA" value={etaMinutes != null ? `${etaMinutes} min` : "-"} />
-              <SummaryRow label="Distance" value={distanceMiles != null ? `${distanceMiles.toFixed(1)} mi` : "-"} />
+              <SummaryRow
+                label={`Distance (${cityConfig.speedUnit === "km/h" ? "km" : "mi"})`}
+                value={distanceVal != null ? `${distanceVal.toFixed(1)} ${cityConfig.speedUnit === "km/h" ? "km" : "mi"}` : "-"}
+              />
               <SummaryRow label="Leave by" value={leaveBy || "-"} />
               <SummaryRow label="Nodes" value={routeIds.length ? routeIds.length.toString() : "-"} />
               <div className="pt-2 text-[11px] text-muted-foreground">

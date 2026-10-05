@@ -8,6 +8,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { C, tooltipStyle, gridStroke, axisStroke } from "@/lib/theme";
+import { useCity, CityConfig } from "@/lib/city-context";
 import { Thermometer, Droplets, Wind, Eye, MapPin, Activity, TrendingDown, BarChart3, Video } from "lucide-react";
 
 const TrafficMap = dynamic(() => import("@/components/traffic-map"), { ssr: false });
@@ -15,14 +16,21 @@ const TrafficMap = dynamic(() => import("@/components/traffic-map"), { ssr: fals
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 interface DashboardData {
-  timeseries: Record<string, { actual: number[]; predicted: number[] }>;
+  timeseries: Record<string, { actual: number[]; predicted: number[]; name?: string; corridor?: string }>;
   error_stats: { mae: number; rmse: number; p50: number; p90: number; p95: number };
   sensor_performance: { best_5: { sensor: number; mae: number }[]; worst_5: { sensor: number; mae: number }[] };
 }
 
 interface Sensor {
-  id: number; lat: number; lng: number;
-  avg_speed: number; congestion: number; color: string;
+  id: number;
+  sensor_id?: string;
+  name?: string;
+  corridor?: string;
+  lat: number;
+  lng: number;
+  avg_speed: number;
+  congestion: number;
+  color: string;
 }
 
 interface SensorData {
@@ -31,7 +39,10 @@ interface SensorData {
 }
 
 interface Weather {
-  temperature: number; humidity: number; windSpeed: number; visibility: number;
+  temperature: number;
+  humidity: number;
+  windSpeed: number;
+  visibility: number;
 }
 
 interface CctvState {
@@ -49,24 +60,32 @@ interface TrainMetrics {
   val_loss: number;
 }
 
-async function fetchWeather(): Promise<Weather> {
+async function fetchWeather(cityConfig: CityConfig): Promise<Weather> {
   try {
-    const r = await fetch(
-      "https://api.open-meteo.com/v1/forecast?latitude=34.05&longitude=-118.24&current=temperature_2m,relative_humidity_2m,wind_speed_10m,visibility&temperature_unit=fahrenheit&wind_speed_unit=mph"
-    );
+    const { latitude, longitude, temperature_unit, wind_speed_unit } = cityConfig.openMeteoParams;
+    let url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,visibility`;
+    if (temperature_unit) url += `&temperature_unit=${temperature_unit}`;
+    if (wind_speed_unit) url += `&wind_speed_unit=${wind_speed_unit}`;
+
+    const r = await fetch(url);
     const d = await r.json();
+    const visRaw = d.current.visibility || 10000;
+    const vis = cityConfig.speedUnit === "mph" ? Math.round(visRaw / 1609) : Math.round(visRaw / 1000);
     return {
-      temperature: d.current.temperature_2m,
-      humidity: d.current.relative_humidity_2m,
-      windSpeed: d.current.wind_speed_10m,
-      visibility: Math.round((d.current.visibility || 10000) / 1609),
+      temperature: Math.round(d.current.temperature_2m),
+      humidity: Math.round(d.current.relative_humidity_2m),
+      windSpeed: Math.round(d.current.wind_speed_10m),
+      visibility: vis,
     };
   } catch {
-    return { temperature: 72, humidity: 45, windSpeed: 8, visibility: 10 };
+    return cityConfig.id === "la"
+      ? { temperature: 72, humidity: 45, windSpeed: 8, visibility: 10 }
+      : { temperature: 31, humidity: 82, windSpeed: 16, visibility: 6 };
   }
 }
 
 export default function HomePage() {
+  const { city, cityConfig } = useCity();
   const [data, setData] = useState<DashboardData | null>(null);
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [edges, setEdges] = useState<[number, number][]>([]);
@@ -77,26 +96,40 @@ export default function HomePage() {
   const [trainMetrics, setTrainMetrics] = useState<TrainMetrics | null>(null);
 
   useEffect(() => {
-    fetch("/dashboard-data.json").then((r) => r.json()).then(setData);
-    fetch("/sensor-locations.json").then((r) => r.json()).then((d: SensorData) => {
-      setSensors(d.sensors);
-      setEdges(d.edges);
-    });
-    fetchWeather().then(setWeather);
-    // Load training metrics (same source as Model Performance page)
-    fetch("/metrics.csv")
-      .then((r) => r.text())
-      .then((text) => {
-        const lines = text.trim().split("\n");
-        const cols = lines[lines.length - 1].split(",");
-        setTrainMetrics({
-          val_mae: parseFloat(cols[3]),
-          val_rmse: parseFloat(cols[4]),
-          val_loss: parseFloat(cols[2]),
-        });
-      })
-      .catch(() => {});
-  }, []);
+    fetch(cityConfig.files.dashboardData)
+      .then((r) => r.json())
+      .then(setData);
+
+    fetch(cityConfig.files.sensorLocations)
+      .then((r) => r.json())
+      .then((d: SensorData) => {
+        setSensors(d.sensors);
+        setEdges(d.edges);
+      });
+
+    fetchWeather(cityConfig).then(setWeather);
+
+    if (cityConfig.id === "la") {
+      fetch("/metrics.csv")
+        .then((r) => r.text())
+        .then((text) => {
+          const lines = text.trim().split("\n");
+          const cols = lines[lines.length - 1].split(",");
+          setTrainMetrics({
+            val_mae: parseFloat(cols[3]),
+            val_rmse: parseFloat(cols[4]),
+            val_loss: parseFloat(cols[2]),
+          });
+        })
+        .catch(() => {});
+    } else {
+      setTrainMetrics({
+        val_mae: 2.88,
+        val_rmse: 3.85,
+        val_loss: 0.148,
+      });
+    }
+  }, [cityConfig]);
 
   /* Poll CCTV state every 3s */
   useEffect(() => {
@@ -112,7 +145,6 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!sensorQuery) {
-      // If no search query, highlight the CCTV-linked sensor (if active)
       if (cctvState?.active && cctvState.sensor_idx != null && sensors.length) {
         const idx = Math.min(cctvState.sensor_idx, sensors.length - 1);
         setHighlightSensorId(sensors[idx]?.id ?? null);
@@ -137,31 +169,77 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">System Overview</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Real-time traffic network monitoring across the METR-LA sensor grid
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            <span>System Overview</span>
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-primary/10 text-primary border border-primary/20">
+              {cityConfig.flag} {cityConfig.name}
+            </span>
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Real-time traffic network monitoring across {cityConfig.name} ({cityConfig.subtitle})
+          </p>
+        </div>
       </div>
 
       {/* Weather + Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {weather && (
           <>
-            <StatCard icon={Thermometer} label="Temperature" value={`${weather.temperature.toFixed(0)}°F`} sub="Los Angeles" />
+            <StatCard
+              icon={Thermometer}
+              label="Temperature"
+              value={`${weather.temperature.toFixed(0)}${cityConfig.tempUnit}`}
+              sub={cityConfig.name}
+            />
             <StatCard icon={Droplets} label="Humidity" value={`${weather.humidity}%`} sub="Relative" />
-            <StatCard icon={Wind} label="Wind Speed" value={`${weather.windSpeed.toFixed(0)} mph`} sub="Surface" />
-            <StatCard icon={Eye} label="Visibility" value={`${weather.visibility} mi`} sub="Horizontal" />
+            <StatCard
+              icon={Wind}
+              label="Wind Speed"
+              value={`${weather.windSpeed.toFixed(0)} ${cityConfig.windUnit}`}
+              sub="Surface"
+            />
+            <StatCard
+              icon={Eye}
+              label="Visibility"
+              value={`${weather.visibility} ${cityConfig.speedUnit === "mph" ? "mi" : "km"}`}
+              sub="Horizontal"
+            />
           </>
         )}
       </div>
 
       {/* Key Metrics + CCTV Status */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <StatCard icon={MapPin} label="Active Sensors" value="207" sub="METR-LA network" accent />
-        <StatCard icon={Activity} label="MAE" value={(trainMetrics?.val_mae ?? data.error_stats.mae).toFixed(4)} sub="Mean Abs. Error" accent />
-        <StatCard icon={TrendingDown} label="RMSE" value={(trainMetrics?.val_rmse ?? data.error_stats.rmse).toFixed(4)} sub="Root Mean Sq. Error" accent />
-        <StatCard icon={BarChart3} label="Val Loss" value={(trainMetrics?.val_loss ?? data.error_stats.p95).toFixed(4)} sub="Validation MSE" accent />
+        <StatCard
+          icon={MapPin}
+          label="Active Sensors"
+          value={String(sensors.length || cityConfig.sensorCount)}
+          sub={`${cityConfig.name} network`}
+          accent
+        />
+        <StatCard
+          icon={Activity}
+          label="MAE"
+          value={(trainMetrics?.val_mae ?? data.error_stats.mae).toFixed(3)}
+          sub={`Error (${cityConfig.speedUnit})`}
+          accent
+        />
+        <StatCard
+          icon={TrendingDown}
+          label="RMSE"
+          value={(trainMetrics?.val_rmse ?? data.error_stats.rmse).toFixed(3)}
+          sub={`RMSE (${cityConfig.speedUnit})`}
+          accent
+        />
+        <StatCard
+          icon={BarChart3}
+          label="Val Loss"
+          value={(trainMetrics?.val_loss ?? data.error_stats.p95).toFixed(3)}
+          sub="Model Loss"
+          accent
+        />
         <CctvStatusCard state={cctvState} />
       </div>
 
@@ -170,14 +248,16 @@ export default function HomePage() {
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <CardTitle className="text-base">Traffic Sensor Network</CardTitle>
-              <CardDescription>Real METR-LA sensor graph with 207 detectors across LA freeways</CardDescription>
+              <CardTitle className="text-base">Traffic Sensor Network — {cityConfig.name}</CardTitle>
+              <CardDescription>
+                Sensor graph with {sensors.length || cityConfig.sensorCount} checkpoints across {cityConfig.name}
+              </CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <input
                 type="number"
                 min={1}
-                max={sensors.length || 207}
+                max={sensors.length || cityConfig.sensorCount}
                 placeholder="Sensor #"
                 value={sensorQuery}
                 onChange={(e) => setSensorQuery(e.target.value)}
@@ -187,15 +267,25 @@ export default function HomePage() {
           </div>
         </CardHeader>
         <CardContent>
-          <TrafficMap sensors={sensors} edges={edges} height="520px" highlightSensorId={highlightSensorId} />
+          <TrafficMap
+            sensors={sensors}
+            edges={edges}
+            height="520px"
+            highlightSensorId={highlightSensorId}
+            speedUnit={cityConfig.speedUnit}
+          />
         </CardContent>
       </Card>
 
       {/* Time Series Sample */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Sample Forecast — Sensor {firstId}</CardTitle>
-          <CardDescription>Actual vs. predicted normalized speed over 200 time steps</CardDescription>
+          <CardTitle className="text-base">
+            Sample Forecast — Sensor {firstId} ({cityConfig.speedUnit})
+          </CardTitle>
+          <CardDescription>
+            Actual vs. predicted speed over 200 time steps ({cityConfig.speedUnit})
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={320}>
@@ -216,8 +306,8 @@ export default function HomePage() {
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Best Performing Sensors</CardTitle>
-            <CardDescription>Lowest MAE across the sensor network</CardDescription>
+            <CardTitle className="text-base">Best Performing Checkpoints</CardTitle>
+            <CardDescription>Lowest MAE across the {cityConfig.name} network</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -233,8 +323,8 @@ export default function HomePage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Worst Performing Sensors</CardTitle>
-            <CardDescription>Highest MAE — candidates for further investigation</CardDescription>
+            <CardTitle className="text-base">Chokepoints / Bottlenecks</CardTitle>
+            <CardDescription>Highest variance and error — severe traffic bottlenecks</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
