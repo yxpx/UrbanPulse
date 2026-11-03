@@ -2,6 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
+import { OperationsProvider } from "@/lib/operations-context";
 import { Sidebar } from "@/components/sidebar";
 import { useAuth } from "@/lib/auth";
 
@@ -26,10 +27,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <Sidebar />
+      <OperationsProvider><Sidebar />
       <main className="ml-56 min-h-screen p-6 bg-background text-foreground">
         {children}
-      </main>
+      </main></OperationsProvider>
     </>
   );
 }
