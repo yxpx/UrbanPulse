@@ -638,6 +638,8 @@ def update_cctv_state(payload: dict):
         "congestion_pct": payload.get("congestion_pct", 0),
         "vehicles": payload.get("vehicles", 0),
         "last_updated": time.strftime("%H:%M:%S"),
+        "updated_at": time.time(),
+        "city": payload.get("city", "la"),
     })
     return {"ok": True}
 

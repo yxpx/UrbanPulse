@@ -59,6 +59,17 @@ export default function CctvAnalyticsPage() {
   const [liveStats, setLiveStats] = useState<LiveStats | null>(null);
   const [summary, setSummary] = useState<{ frames: number; seconds: number; avg: number; max: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const detectionCityRef = useRef(cityConfig.id);
+
+  useEffect(() => {
+    abortRef.current?.abort();
+    setLiveStats(null);
+    setLiveFrame(null);
+    setSummary(null);
+    setSensorCtx(null);
+    setStatus("");
+    return () => { abortRef.current?.abort(); };
+  }, [cityConfig.id]);
 
   /* sensor linkage */
   const [sensorIdx, setSensorIdx] = useState<number>(3);
@@ -100,13 +111,14 @@ export default function CctvAnalyticsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         active: isRunning,
+        city: detectionCityRef.current,
         sensor_idx: sensorIdx,
         congestion: liveStats.congestion,
         congestion_pct: liveStats.congestion_pct,
         vehicles: liveStats.detections,
       }),
     }).catch(() => {});
-  }, [liveStats, isRunning, sensorIdx]);
+  }, [liveStats, isRunning, sensorIdx, cityConfig.id]);
 
   /* push inactive on stop */
   useEffect(() => {
@@ -122,6 +134,7 @@ export default function CctvAnalyticsPage() {
   /* ── stream handler ──────────────────────────────────────────────── */
 
   const runDetection = async () => {
+    detectionCityRef.current = cityConfig.id;
     setIsRunning(true);
     setStatus("Connecting...");
     setSummary(null);
