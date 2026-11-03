@@ -13,6 +13,8 @@ import {
   Route, 
   Video,
   Settings,
+  ClipboardList,
+  FileText,
   Globe
 } from "lucide-react";
 
@@ -20,6 +22,8 @@ const links = [
   { href: "/", label: "System Overview", icon: LayoutDashboard },
   { href: "/route-planner", label: "Route Planner", icon: Route },
   { href: "/cctv-analytics", label: "CCTV Analytics", icon: Video },
+  { href: "/traffic-operations", label: "Traffic Operations", icon: ClipboardList },
+  { href: "/reports", label: "Reports & Review", icon: FileText },
   { href: "/prediction-analysis", label: "Prediction Analysis", icon: LineChart },
   { href: "/feature-attribution", label: "Feature Attribution", icon: Layers },
   { href: "/model-performance", label: "Model Performance", icon: Activity },
