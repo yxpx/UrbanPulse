@@ -135,3 +135,16 @@ python -u backend/train.py --epochs 30 --batch 64 --window 12 --horizon 3
 - `--weather`: Flag to include weather features during training.
 
 Training metrics are saved to `reports/metrics.csv`.
+
+## Traffic Operations and Reports
+
+The sidebar includes **Traffic Operations** (`/traffic-operations`) and **Reports & Review** (`/reports`). Both follow the selected LA/Mumbai city.
+
+- Operations derives historical hotspots and archived model forecast warnings from the existing city time-series bundles. It polls the active CCTV state every five seconds and checks the next 48 hours of Open-Meteo hourly rainfall for weather warnings.
+- Each insight offers relevant response actions, optional notes, acknowledgement, resolution, reopening, and an activity timeline. Filters cover severity, source, corridor, status, and search; results are paginated.
+- Reports provide selectable archived sample ranges and sections, network speed charts, hotspot tables, recorded CCTV alerts, and the operator action register. Save configurations, export selected sections as CSV, or print/save an A4 PDF. Turn off browser headers and footers in the print dialog for the cleanest output.
+- Actions and report configurations are saved in this browser's local storage. CCTV and action report sections include all saved city activity; the sample range applies to traffic statistics. The sample bundles do not supply calendar timestamps, so traffic windows use sample numbers.
+
+Historical hotspots require at least three valid speed samples below 40% of reference speed. Archived forecast warnings require at least three predictions below 30%. Reference speed uses the sensor's configured free-flow speed where available, otherwise its maximum valid observed speed. Rain warnings trigger at 7.5 mm/hour, or at 4 mm/hour with at least 80% precipitation probability. Camera alerts trigger at 45% congestion and become critical at 70%; inactive, mismatched-city, or stale feeds are excluded. Unavailable external services are shown in the source status strip.
+
+Filter behaviour and review preparation: see [Traffic Operations review Q&A](reports/operations_review_qa.md). Current status and recorded activity are independent filters, so resolved insights remain discoverable by their earlier actions.
